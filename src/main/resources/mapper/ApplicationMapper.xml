@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.metoo.monitor.core.mapper.ApplicationMapper">
+
+    <select id="selectObjById" parameterType="java.lang.Long" resultType="com.metoo.monitor.core.entity.Application">
+        SELECT *
+        FROM metoo_application
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultType="com.metoo.monitor.core.entity.Application">
+        SELECT *
+        FROM metoo_application
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+
+    <select id="selectObjConditionQuery" parameterType="com.metoo.monitor.core.dto.ApplicationDTO" resultType="com.metoo.monitor.core.entity.Application">
+        SELECT *
+        FROM metoo_application
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.metoo.monitor.core.entity.Application" keyProperty="id" useGeneratedKeys="true" keyColumn="id">
+        INSERT INTO metoo_application
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="version != null and version != ''">
+                version,
+            </if>
+            <if test="desc != null and desc != ''">
+                `desc`,
+            </if>
+            <if test="accessoryId != null and accessoryId != ''">
+                accessoryId,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffixOverrides="," suffix=")">
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="version != null and version != ''">
+                #{version},
+            </if>
+            <if test="desc != null and desc != ''">
+                #{desc},
+            </if>
+            <if test="accessoryId != null and accessoryId != ''">
+                #{accessoryId},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.metoo.monitor.core.entity.Application">
+        UPDATE metoo_application
+        <set>
+            <if test="addTime != null">
+                addTime = #{addTime},
+            </if>
+            <if test="version != null">
+                version = #{version},
+            </if>
+            <if test="desc != null">
+                `desc` = #{desc},
+            </if>
+            <if test="accessoryId != null and accessoryId != ''">
+                accessoryId = #{accessoryId},
+            </if>
+        </set>
+        where id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from metoo_application where id = #{id}
+    </delete>
+
+</mapper>
