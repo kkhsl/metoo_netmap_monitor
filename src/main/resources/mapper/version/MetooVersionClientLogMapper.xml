@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.monitor.core.mapper.version.MetooVersionClientLogMapper">
+
+    <select id="list" resultType="com.metoo.monitor.core.entity.version.MetooVersionClientLog"
+            parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo">
+
+    </select>
+
+    <insert id="save" parameterType="com.metoo.monitor.core.entity.version.MetooVersionClientLog">
+        insert into metoo_version_client_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="versionId != null">
+                version_id,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="addTime != null">
+                add_time,
+            </if>
+            <if test="opId != null">
+                op_id,
+            </if>
+            <if test="opName != null">
+                op_name,
+            </if>
+            <if test="versionStatus != null">
+                version_status,
+            </if>
+            <if test="errorInfo != null">
+                error_info,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="versionId != null">
+                #{versionId,jdbcType=BIGINT},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                #{addTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="opId != null">
+                #{opId,jdbcType=BIGINT},
+            </if>
+            <if test="opName != null">
+                #{opName,jdbcType=VARCHAR},
+            </if>
+            <if test="versionStatus != null">
+                #{versionStatus,jdbcType=TINYINT},
+            </if>
+            <if test="errorInfo != null">
+                #{errorInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+</mapper>

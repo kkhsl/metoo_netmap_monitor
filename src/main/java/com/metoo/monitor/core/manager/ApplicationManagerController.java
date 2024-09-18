@@ -13,6 +13,10 @@ import com.metoo.monitor.core.utils.ResponseUtil;
 import com.metoo.monitor.core.utils.file.ApplicationUploadUtils;
 import com.metoo.monitor.core.vo.PageInfo;
 import com.metoo.monitor.core.vo.Result;
+import com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Api(tags = "版本管理")
 @RequestMapping("/monitor/application")
 @RestController
 public class ApplicationManagerController {
@@ -351,5 +356,10 @@ public class ApplicationManagerController {
         }
         return ResponseUtil.badArgument();
     }
-
+    @GetMapping("/queryList")
+    @ApiOperation(value = "查询版本列表", notes = "查询版本列表")
+    @ApiImplicitParam(name = "version", value = "版本号", dataType = "String")
+    public Result queryList(String version) {
+        return ResponseUtil.ok(applicationService.queryList(version));
+    }
 }

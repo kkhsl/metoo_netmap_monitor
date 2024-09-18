@@ -18,4 +18,11 @@ public interface IApplicationService {
     boolean save(Application instance);
 
     boolean delete(Long id);
+
+    /**
+     * 根据版本名称查询版本列表
+     * @param version
+     * @return
+     */
+    List<Application> queryList(String version);
 }

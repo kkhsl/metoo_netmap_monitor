@@ -55,6 +55,11 @@
             <artifactId>druid</artifactId>
             <version>1.0.9</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.4.3</version>
+        </dependency>
 
         <!--Mybatis-->
         <dependency>
@@ -62,6 +67,7 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>2.1.2</version>
     </dependency>
+
         <!--  分页查询插件：暂时使用分页插件，后续改为自己封装分页查询  -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>

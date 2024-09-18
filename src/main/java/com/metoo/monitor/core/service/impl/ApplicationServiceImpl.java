@@ -75,5 +75,10 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
     }
 
+    @Override
+    public List<Application> queryList(String version) {
+        return this.applicationMapper.queryList(version);
+    }
+
 
 }
