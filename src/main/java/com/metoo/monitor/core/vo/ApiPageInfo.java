@@ -18,10 +18,10 @@ public class ApiPageInfo<T> {
 
 
     @ApiModelProperty("起始条数")
-    private Integer currentPage;
+    private Integer currentPage=1;
 
     @ApiModelProperty("每页条数")
-    private Integer pageSize;
+    private Integer pageSize=15;
 
     @ApiModelProperty("总页数")
     private Integer pages;
@@ -36,10 +36,12 @@ public class ApiPageInfo<T> {
     private Integer endRow;
 
     @ApiModelProperty("排序")
-    private String orderBy;
+    private String orderBy="add_time";
 
     @ApiModelProperty("结果集")
     private Object data;
+
+    private String orderType = "DESC";
 
     public ApiPageInfo(Page page) {
         this.data = page.getResult();

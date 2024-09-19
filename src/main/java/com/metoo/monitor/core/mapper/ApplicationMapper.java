@@ -21,4 +21,5 @@ public interface ApplicationMapper {
 
     int delete(Long id);
 
+    List<Application> queryList(String version);
 }

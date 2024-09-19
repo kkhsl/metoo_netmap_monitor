@@ -30,6 +30,17 @@
             ${orderType}
         </if>
     </select>
+    <select id="queryList" resultType="com.metoo.monitor.core.entity.Application"
+            parameterType="java.lang.String">
+        SELECT *
+        FROM metoo_application
+        <where>
+            <if test="version != null and version != ''">
+                and version like concat(#{version},'%')
+            </if>
+        </where>
+        ORDER BY addTime desc
+    </select>
 
     <insert id="save" parameterType="com.metoo.monitor.core.entity.Application" keyProperty="id" useGeneratedKeys="true" keyColumn="id">
         INSERT INTO metoo_application

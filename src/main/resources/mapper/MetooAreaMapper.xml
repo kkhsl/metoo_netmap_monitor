@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.monitor.core.mapper.MetooAreaMapper">
+
+    <select id="queryList" resultType="com.metoo.monitor.core.entity.MetooArea">
+        select * from metoo_area a
+        where a.unit_id is null
+        order by a.id asc
+    </select>
+    <select id="queryUnitList" resultType="com.metoo.monitor.core.vo.MetooAreaVo"
+            parameterType="java.lang.Long">
+        select a.unit_id as id ,a.name from metoo_area a
+        where a.unit_id is not null
+        and a.parent_id=#{areaId,jdbcType=BIGINT}
+        order by a.unit_id asc
+    </select>
+</mapper>
