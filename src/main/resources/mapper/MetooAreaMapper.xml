@@ -10,11 +10,8 @@
             <if test="parentId != null">
                 parent_id=#{parentId,jdbcType=BIGINT},
             </if>
-            <if test="unitId != null">
-                unit_id=#{unitId,jdbcType=BIGINT},
-            </if>
         </set>
-        where id=#{id,jdbcType=BIGINT}
+        where unit_id=#{unitId,jdbcType=BIGINT}
     </update>
 
     <select id="queryList" resultType="com.metoo.monitor.core.entity.MetooArea">
@@ -31,19 +28,37 @@
     </select>
     <select id="queryById" resultType="com.metoo.monitor.core.entity.MetooArea" parameterType="java.lang.Long">
         select * from metoo_area a
-        where a.id=#{areaId,jdbcType=BIGINT}
+        where a.unit_id=#{unitId,jdbcType=BIGINT}
     </select>
     <select id="queryAll" resultType="com.metoo.monitor.core.entity.MetooArea">
         select * from metoo_area a
         order by a.id asc
     </select>
+    <select id="queryAreaByPath" resultType="com.metoo.monitor.core.entity.MetooArea"
+            parameterType="java.lang.String">
+        select * from (
+        WITH RECURSIVE category_path (id, name, path, depth) AS (
+  SELECT id,
+         name,
+         CONCAT(name, '/') AS path,
+         1 AS depth
+  FROM metoo_area ma
+  WHERE parent_id =0
+UNION ALL
+  SELECT c.id,
+         c.name,
+         CONCAT(cp.path, c.name, '/') AS path,
+         depth + 1
+  FROM category_path AS cp
+  JOIN metoo_area AS c ON cp.id = c.parent_id
+  and c.unit_id is null )
+SELECT * FROM category_path) a
+where a.path=#{name}
+    </select>
 
     <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooArea">
         insert into metoo_area
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
             <if test="name != null">
                 name,
             </if>
@@ -55,9 +70,6 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
             <if test="name != null">
                 #{name,jdbcType=VARCHAR},
             </if>
@@ -69,4 +81,5 @@
             </if>
         </trim>
     </insert>
+
 </mapper>

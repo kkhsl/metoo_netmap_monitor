@@ -6,6 +6,8 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.metoo.monitor.core.entity.MetooArea;
 import com.metoo.monitor.core.exception.BusiException;
 import com.metoo.monitor.core.mapper.MetooAreaMapper;
@@ -80,29 +82,43 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
     @Override
     public boolean syncSave(MetooAreaSyncVo areaInfo) {
         // 判断区域编码是否存在
-        if (areaInfo.getId() != null) {
-            MetooArea area = this.baseMapper.queryById(areaInfo.getId());
-            if (area == null) {
-                //不存在则新增
-                return this.baseMapper.saveInfo(Convert.convert(MetooArea.class, areaInfo)) > 0;
+        boolean flag = StrUtil.isNotEmpty(areaInfo.getUnitId()) && StrUtil.isNotEmpty(areaInfo.getArea())
+                && StrUtil.isNotEmpty(areaInfo.getUnit()) && StrUtil.isNotEmpty(areaInfo.getCity());
+        if (flag) {
+            MetooArea area = this.baseMapper.queryById(Long.parseLong(areaInfo.getUnitId()));
+            // 先根据path路径查询所属的路径信息：city+area
+            String path = areaInfo.getCity() + StrUtil.SLASH + areaInfo.getArea() + StrUtil.SLASH;
+            List<MetooArea> findAreaList = this.baseMapper.queryAreaByPath(path);
+            if (CollectionUtil.isNotEmpty(findAreaList)) {
+                MetooArea saveEntity = Convert.convert(MetooArea.class, areaInfo);
+                saveEntity.setName(areaInfo.getUnit());
+                saveEntity.setParentId(findAreaList.get(0).getId());
+                if (area == null) {
+                    //不存在则新增
+                    return this.baseMapper.saveInfo(saveEntity) > 0;
+                } else {
+                    //存在则更新操作
+                    return this.baseMapper.updateInfo(saveEntity) > 0;
+                }
             } else {
-                //存在则更新操作
-                return this.baseMapper.updateInfo(Convert.convert(MetooArea.class, areaInfo)) > 0;
-
+                //找不到区域信息
+                log.error("找不到区域信息:{}", JSON.toJSONString(areaInfo));
             }
         } else {
             throw new BusiException("同步参数不正确");
         }
+        return false;
     }
 
     /**
      * 批量保存接口
+     *
      * @param areaInfos
      * @return
      */
     @Override
     public boolean syncBatchArea(List<MetooAreaSyncVo> areaInfos) {
-        if(CollectionUtil.isNotEmpty(areaInfos)){
+        if (CollectionUtil.isNotEmpty(areaInfos)) {
             areaInfos.forEach(this::syncSave);
         }
         return true;

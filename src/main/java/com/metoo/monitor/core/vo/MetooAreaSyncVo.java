@@ -21,15 +21,15 @@ public class MetooAreaSyncVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("区域编码")
-    private Long id;
-
     @ApiModelProperty("区域名称")
-    private String name;
+    private String area;
 
-    @ApiModelProperty("上级编码")
-    private Long parentId;
+    @ApiModelProperty("单位名称")
+    private String unit;
+
+    @ApiModelProperty("地市名称")
+    private String city;
 
     @ApiModelProperty("单位编码")
-    private Long unitId;
+    private String unitId;
 }

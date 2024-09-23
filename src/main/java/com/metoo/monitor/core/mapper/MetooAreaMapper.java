@@ -31,10 +31,10 @@ public interface MetooAreaMapper {
 
     /**
      * 查询区域信息
-     * @param areaId
+     * @param unitId
      * @return
      */
-    MetooArea queryById(Long areaId);
+    MetooArea queryById(Long unitId);
     /**
      * 查询所有数据
      * @return
@@ -54,4 +54,11 @@ public interface MetooAreaMapper {
      * @return
      */
     int updateInfo(MetooArea vo);
+
+    /**
+     *根据路径名称查询所属区域信息
+     * @param name
+     * @return
+     */
+    List<MetooArea> queryAreaByPath(String name);
 }
