@@ -5,8 +5,10 @@ import com.metoo.monitor.core.entity.Accessory;
 import com.metoo.monitor.core.entity.Application;
 import com.metoo.monitor.core.service.IAccessoryService;
 import com.metoo.monitor.core.service.IApplicationService;
+import com.metoo.monitor.core.service.IMetooAreaService;
 import com.metoo.monitor.core.service.IMetooVersionClientService;
 import com.metoo.monitor.core.utils.ResponseUtil;
+import com.metoo.monitor.core.vo.MetooAreaSyncVo;
 import com.metoo.monitor.core.vo.Result;
 import com.metoo.monitor.core.vo.version.MetooVersionClientUpdateVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientVo;
@@ -46,6 +48,9 @@ public class ApiManagerController {
     private IAccessoryService accessoryService;
     @Autowired
     private  IMetooVersionClientService metooVersionClientService;
+
+    @Autowired
+    private IMetooAreaService metooAreaService;
     @ApiOperation("版本信息")
     @GetMapping
     public String version(){
@@ -248,5 +253,29 @@ public class ApiManagerController {
             }
         }
         return null;
+    }
+
+    @PostMapping("/syncArea")
+    @ApiOperation(value = "同步新增区域信息-单个新增", notes = "同步新增-外部接口调用同步-单个新增")
+    public Result syncSave(@RequestBody MetooAreaSyncVo areaInfo) {
+        try {
+            metooAreaService.syncSave(areaInfo);
+            return ResponseUtil.ok();
+        }catch (Exception ex){
+            log.error("同步新增区域信息-单个新增出现错误：{}",ex);
+            return ResponseUtil.fail(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/syncBatchArea")
+    @ApiOperation(value = "同步新增区域信息-批量更新", notes = "同步新增-外部接口调用同步-批量更新")
+    public Result syncBatchArea(@RequestBody List<MetooAreaSyncVo> areaInfos) {
+        try {
+            metooAreaService.syncBatchArea(areaInfos);
+            return ResponseUtil.ok();
+        }catch (Exception ex){
+            log.error("同步新增区域信息-批量更新出现错误：{}",ex);
+            return ResponseUtil.fail(ex.getMessage());
+        }
     }
 }

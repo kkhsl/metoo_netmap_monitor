@@ -46,4 +46,11 @@ public interface IMetooAreaService {
      * @return
      */
     boolean syncSave(MetooAreaSyncVo areaInfo);
+
+    /**
+     * 批量保存接口
+     * @param areaInfos
+     * @return
+     */
+    boolean syncBatchArea(List<MetooAreaSyncVo> areaInfos);
 }

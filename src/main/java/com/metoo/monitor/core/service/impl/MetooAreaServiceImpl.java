@@ -13,7 +13,9 @@ import com.metoo.monitor.core.service.IMetooAreaService;
 import com.metoo.monitor.core.vo.MetooAreaSyncVo;
 import com.metoo.monitor.core.vo.MetooAreaVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
  * @since 2024-09-18
  */
 @Service
+@Slf4j
 @AllArgsConstructor
 public class MetooAreaServiceImpl implements IMetooAreaService {
 
@@ -90,6 +93,19 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
         } else {
             throw new BusiException("同步参数不正确");
         }
+    }
+
+    /**
+     * 批量保存接口
+     * @param areaInfos
+     * @return
+     */
+    @Override
+    public boolean syncBatchArea(List<MetooAreaSyncVo> areaInfos) {
+        if(CollectionUtil.isNotEmpty(areaInfos)){
+            areaInfos.forEach(this::syncSave);
+        }
+        return true;
     }
 
     /**
