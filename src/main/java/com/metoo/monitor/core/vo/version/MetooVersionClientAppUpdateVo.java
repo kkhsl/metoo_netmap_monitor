@@ -3,6 +3,7 @@ package com.metoo.monitor.core.vo.version;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -19,7 +20,7 @@ import java.io.Serializable;
  */
 @ApiModel("客户端版本管理")
 @Data
-@Accessors(chain = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class MetooVersionClientAppUpdateVo {
@@ -38,11 +39,4 @@ public class MetooVersionClientAppUpdateVo {
      */
     @ApiModelProperty("指定安装的版本")
     private String appVersion;
-
-    /**
-     * 指定安装的版本文件路径
-     */
-    @ApiModelProperty("指定安装的版本文件路径")
-    private String fileUrl;
-
 }

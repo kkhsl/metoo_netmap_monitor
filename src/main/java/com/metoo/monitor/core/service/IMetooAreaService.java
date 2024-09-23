@@ -1,6 +1,8 @@
 package com.metoo.monitor.core.service;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.metoo.monitor.core.entity.MetooArea;
+import com.metoo.monitor.core.vo.MetooAreaSyncVo;
 import com.metoo.monitor.core.vo.MetooAreaVo;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,6 @@ import java.util.List;
  * @author codeGenerator
  * @since 2024-09-18
  */
-@Service
 public interface IMetooAreaService {
 
     List<MetooArea> queryTree();
@@ -25,4 +26,24 @@ public interface IMetooAreaService {
      * @return
      */
     List<MetooAreaVo> queryUnitList(Long areaId);
+
+    /**
+     * 查询区域名称
+     * @param areaId
+     * @return
+     */
+    MetooArea queryById(Long areaId);
+
+    /**
+     * 所有节点树
+     * @return
+     */
+    List<Tree<Long>> allTree();
+
+    /**
+     * 同步保存接口
+     * @param areaInfo
+     * @return
+     */
+    boolean syncSave(MetooAreaSyncVo areaInfo);
 }

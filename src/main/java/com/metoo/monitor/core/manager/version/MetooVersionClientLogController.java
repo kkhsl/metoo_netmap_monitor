@@ -10,6 +10,7 @@ import com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,11 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(tags = "客户端版本管理日志")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/monitor/versionClientLog")
 public class MetooVersionClientLogController {
 
-    @Autowired
-    private IMetooVersionClientLogService logService;
+    private final IMetooVersionClientLogService logService;
 
 
     @PostMapping("/list")

@@ -1,15 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.metoo.monitor.core.mapper.MetooVersionClientLogMapper">
+    <update id="updateLogStatus" parameterType="com.metoo.monitor.core.entity.MetooVersionClientLog">
+        update metoo_version_client_log
+        set version_status=#{versionStatus,jdbcType=TINYINT}
+        <if test="errorInfo !=null and errorInfo !=''">
+            , error_info=#{errorInfo,jdbcType=VARCHAR}
+        </if>
+        where unit_id=#{unitId,jdbcType=BIGINT}
+            and version_id=#{versionId,jdbcType=BIGINT}
+    </update>
 
     <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
             parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo">
-        select * from metoo_version_client_log
+        select a.*,b.`desc` as versionMsg from metoo_version_client_log a
+        left join metoo_application b
+        on a.version_id =b.id
         where 1=1
-          and delete_STATUS=0
-       <if test="resultFlag !=null and resultFlag !=''">
-        and result_flag=#{resultFlag,jdbcType=TINYINT}
+          and a.delete_STATUS=0
+          and a.unit_id=#{unitId,jdbcType=BIGINT}
+       <if test="versionStatus !=null and versionStatus !=''">
+        and a.version_status=#{versionStatus,jdbcType=TINYINT}
         </if>
+        order by a.add_time desc
+    </select>
+    <select id="lastInfo" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
+            parameterType="java.lang.Long">
+        select a.*,b.version_type  from metoo_version_client_log a
+        left join metoo_application b
+        on a.version_id =b.id
+        where 1=1
+        and a.delete_STATUS=0
+        and a.unit_id=#{unitId,jdbcType=BIGINT}
+        and a.version_status!=3
+        order by a.add_time desc
+        limit 1
+    </select>
+    <select id="queryUpdateVersion" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
+            parameterType="java.lang.Long">
+        select a.* from metoo_version_client_log a
+        where 1=1
+        and a.delete_STATUS=0
+        and a.unit_id=#{unitId,jdbcType=BIGINT}
+        and a.version_status=1
+        order by a.add_time desc
     </select>
 
     <insert id="save" parameterType="com.metoo.monitor.core.entity.MetooVersionClientLog">

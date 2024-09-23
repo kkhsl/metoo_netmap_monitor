@@ -5,19 +5,19 @@ package com.metoo.monitor.core.enums;
  * @author zzy
  */
 public enum ClientStatus {
-    OFFLINE("0","离线"),
-    ONLINE("1", "在线");
+    OFFLINE(0,"离线"),
+    ONLINE(1, "在线");
 
-    private String code;
+    private Integer code;
 
     private String value;
 
-    private ClientStatus(String code, String value) {
+    private ClientStatus(Integer code, String value) {
         this.code = code;
         this.value = value;
     }
 
-    public static String getValueByCode(String code){
+    public static String getValueByCode(Integer code){
         for (ClientStatus type : ClientStatus.values()) {
             if (type.getCode().equals(code)) {
                 return type.getValue();
@@ -26,7 +26,7 @@ public enum ClientStatus {
         return null;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 

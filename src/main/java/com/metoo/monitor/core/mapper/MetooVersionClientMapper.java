@@ -2,6 +2,7 @@ package com.metoo.monitor.core.mapper;
 
 import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo;
+import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -28,14 +29,14 @@ public interface MetooVersionClientMapper {
      * @param saveEntity
      * @return
      */
-    boolean saveInfo(MetooVersionClient saveEntity);
+    int saveInfo(MetooVersionClient saveEntity);
 
     /**
      * 删除客户端版本
      * @param unitId
      * @return
      */
-    boolean deleteById(Long unitId);
+    int deleteById(Long unitId);
 
     /**
      * 获取详情
@@ -43,4 +44,31 @@ public interface MetooVersionClientMapper {
      * @return
      */
     MetooVersionClient detailById(Long unitId);
+
+    /**
+     * 更新信息
+     * @param updateInfo
+     * @return
+     */
+    int updateAppInfoAndStatus(MetooVersionClient updateInfo);
+
+    /**
+     * 客户端更新当前版本状态
+     * @param updateInfo
+     * @return
+     */
+    int updateAppInfoAndStatusFromClient(MetooVersionClient updateInfo);
+
+    /**
+     * 查询所有客户端列表
+     * @return
+     */
+    List<MetooVersionClient> queryAllList();
+
+    /**
+     * 更新客户端状态
+     * @param unitId
+     * @return
+     */
+    int updateClientStatus(@Param("unitId")Long unitId, @Param( "clientStatus")Integer clientStatus);
 }

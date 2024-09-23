@@ -1,24 +1,24 @@
 package com.metoo.monitor.core.enums;
 
 /**
- * 客户端版本状态枚举类
+ * 客户端版本类型枚举类
  * @author zzy
  */
-public enum VersionStatus {
-    NORMAL(0,"完成"),
-    ABNORMAL(1, "未完成");
+public enum VersionType {
+    ADD(0,"增量版本"),
+    ALL(1, "全量版本");
 
     private Integer code;
 
     private String value;
 
-    private VersionStatus(Integer code, String value) {
+    private VersionType(Integer code, String value) {
         this.code = code;
         this.value = value;
     }
 
     public static String getValueByCode(Integer code){
-        for (VersionStatus type : VersionStatus.values()) {
+        for (VersionType type : VersionType.values()) {
             if (type.getCode().equals(code)) {
                 return type.getValue();
             }

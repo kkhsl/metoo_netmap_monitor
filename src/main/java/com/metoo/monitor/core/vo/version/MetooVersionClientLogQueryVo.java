@@ -29,7 +29,7 @@ public class MetooVersionClientLogQueryVo extends ApiPageInfo<MetooVersionClient
     private Long unitId;
 
     @ApiModelProperty("版本状态，1表示已发布，2表示待升级，3表示升级成功，4表示失败")
-    private Integer resultFlag;
+    private Integer versionStatus;
 
 
 }

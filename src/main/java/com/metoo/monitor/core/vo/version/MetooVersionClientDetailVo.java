@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
  */
 @ApiModel("客户端版本分页查询管理")
 @Data
-@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class MetooVersionClientDetailVo extends MetooVersionClientVo {
@@ -35,13 +34,13 @@ public class MetooVersionClientDetailVo extends MetooVersionClientVo {
     private String versionRemark;
 
     @ApiModelProperty("版本状态0表示已完成，1表示未完成")
-    private String versionStatus;
+    private Integer versionStatus;
 
     @ApiModelProperty("版本状态名称")
     private String versionStatusName;
 
     @ApiModelProperty("客户端状态0表示离线，1表示在线")
-    private String clientStatus;
+    private Integer clientStatus;
 
     @ApiModelProperty("客户端状态名称")
     private String clientStatusName;

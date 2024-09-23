@@ -28,6 +28,15 @@ public class MetooVersionClientQueryVo extends ApiPageInfo<MetooVersionClientQue
 
     @ApiModelProperty("所属区域编码")
     private Long areaId;
-
+    /**
+     * 客户端状态：0表示离线，1表示在线
+     */
+    @ApiModelProperty("客户端状态：0表示离线，1表示在线")
+    private Integer clientStatus;
+    /**
+     * 版本状态：0表示已完成，1表示未完成
+     */
+    @ApiModelProperty("版本状态：0表示已完成，1表示未完成")
+    private Integer versionStatus;
 
 }

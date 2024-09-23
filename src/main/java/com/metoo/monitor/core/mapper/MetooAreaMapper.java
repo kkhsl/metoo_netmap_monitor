@@ -28,4 +28,30 @@ public interface MetooAreaMapper {
      * @return
      */
     List<MetooAreaVo> queryUnitList(Long areaId);
+
+    /**
+     * 查询区域信息
+     * @param areaId
+     * @return
+     */
+    MetooArea queryById(Long areaId);
+    /**
+     * 查询所有数据
+     * @return
+     */
+    List<MetooArea> queryAll();
+
+    /**
+     * 保存区域信息
+     * @param vo
+     * @return
+     */
+    int saveInfo(MetooArea vo);
+
+    /**
+     * 更新区域信息
+     * @param vo
+     * @return
+     */
+    int updateInfo(MetooArea vo);
 }

@@ -16,5 +16,9 @@ public class Application extends IdEntity{
     private String size;
 
     private Long accessoryId;
+    /**
+     * 版本类型 0表示增量版本，1表示全量版本
+     */
+    private Integer versionType;
 
 }

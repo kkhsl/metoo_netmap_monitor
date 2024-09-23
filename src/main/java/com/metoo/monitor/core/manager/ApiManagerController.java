@@ -5,8 +5,13 @@ import com.metoo.monitor.core.entity.Accessory;
 import com.metoo.monitor.core.entity.Application;
 import com.metoo.monitor.core.service.IAccessoryService;
 import com.metoo.monitor.core.service.IApplicationService;
+import com.metoo.monitor.core.service.IMetooVersionClientService;
+import com.metoo.monitor.core.utils.ResponseUtil;
 import com.metoo.monitor.core.vo.Result;
+import com.metoo.monitor.core.vo.version.MetooVersionClientUpdateVo;
+import com.metoo.monitor.core.vo.version.MetooVersionClientVo;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,10 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/api/soft/version")
+@Slf4j
 @RestController
 public class ApiManagerController {
 
@@ -40,7 +44,8 @@ public class ApiManagerController {
     private IApplicationService applicationService;
     @Autowired
     private IAccessoryService accessoryService;
-
+    @Autowired
+    private  IMetooVersionClientService metooVersionClientService;
     @ApiOperation("版本信息")
     @GetMapping
     public String version(){
@@ -192,5 +197,56 @@ public class ApiManagerController {
         }
         return JSONObject.toJSONString(map);
     }
+    @PostMapping("/detectUpdate")
+    @ApiOperation(value = "客户端版本检测更新", notes = "客户端版本检测更新")
+    public Result detectUpdate(@RequestBody @Validated MetooVersionClientVo curVo) {
+        return ResponseUtil.ok(metooVersionClientService.detectUpdate(curVo));
+    }
 
+    @PostMapping("/refreshUpdate")
+    @ApiOperation(value = "客户端版本更新后同步更新到版本管理", notes = "客户端版本更新后同步更新到版本管理")
+    public Result updateVersionFromClient(@RequestBody @Validated MetooVersionClientUpdateVo curVo) {
+        try {
+            metooVersionClientService.updateVersionFromClient(curVo);
+            return ResponseUtil.ok();
+        } catch (Exception e) {
+            log.error("客户端版本更新后同步更新到版本管理出现问题：{}", e);
+            return ResponseUtil.fail(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/downloadVersion/{id}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable(name = "id") String id) throws IOException {
+        Application application = this.applicationService.selectObjById(Long.parseLong(id));
+        if(application != null){
+            Long accessoryId = application.getAccessoryId();
+            if(accessoryId != null || accessoryId.equals("")){
+                Accessory accessory = this.accessoryService.selectObjById(accessoryId);
+                if(accessory != null){
+                    // Load file as Resource
+                    String FILE_DIRECTORY = accessory.getPath();
+                    String fileName = accessory.getName();
+                    Path filePath = Paths.get(FILE_DIRECTORY).resolve(fileName).normalize();
+                    Resource resource = new UrlResource(filePath.toUri());
+
+                    // Check if file exists
+                    if (!resource.exists()) {
+                        throw new RuntimeException("File not found: " + fileName);
+                    }
+
+                    // Set content disposition
+                    String contentType = Files.probeContentType(filePath);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+                    headers.add(HttpHeaders.CONTENT_TYPE, contentType != null ? contentType : MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+                    return ResponseEntity.ok()
+                            .headers(headers)
+                            .body(resource);
+                }
+            }
+        }
+        return null;
+    }
 }

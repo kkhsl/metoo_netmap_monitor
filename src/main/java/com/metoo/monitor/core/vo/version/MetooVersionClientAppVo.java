@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.validation.annotation.Validated;
 
-import java.io.Serializable;
 
 /**
  * <p>
@@ -20,7 +18,6 @@ import java.io.Serializable;
  */
 @ApiModel("客户端版本管理")
 @Data
-@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class MetooVersionClientAppVo {

@@ -41,6 +41,18 @@
         </where>
         ORDER BY addTime desc
     </select>
+    <select id="queryUpdateVersions" resultType="com.metoo.monitor.core.entity.Application">
+        SELECT *
+        FROM metoo_application
+        WHERE id>#{startId}
+        and id &lt;=#{endId}
+        ORDER BY id desc
+    </select>
+    <select id="queryVersionByName" resultType="com.metoo.monitor.core.entity.Application">
+        SELECT *
+        FROM metoo_application
+        WHERE version = #{version}
+    </select>
 
     <insert id="save" parameterType="com.metoo.monitor.core.entity.Application" keyProperty="id" useGeneratedKeys="true" keyColumn="id">
         INSERT INTO metoo_application
@@ -53,6 +65,9 @@
             </if>
             <if test="desc != null and desc != ''">
                 `desc`,
+            </if>
+            <if test="versionType != null and versionType != ''">
+                versio_type,
             </if>
             <if test="accessoryId != null and accessoryId != ''">
                 accessoryId,
@@ -67,6 +82,9 @@
             </if>
             <if test="desc != null and desc != ''">
                 #{desc},
+            </if>
+            <if test="versionType != null and versionType != ''">
+                #{versionType},
             </if>
             <if test="accessoryId != null and accessoryId != ''">
                 #{accessoryId},
@@ -85,6 +103,9 @@
             </if>
             <if test="desc != null">
                 `desc` = #{desc},
+            </if>
+            <if test="versionType != null and versionType != ''">
+                version_type=#{versionType},
             </if>
             <if test="accessoryId != null and accessoryId != ''">
                 accessoryId = #{accessoryId},

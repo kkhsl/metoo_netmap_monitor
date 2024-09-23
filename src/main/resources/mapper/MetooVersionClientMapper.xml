@@ -3,34 +3,35 @@
 <mapper namespace="com.metoo.monitor.core.mapper.MetooVersionClientMapper">
     <select id="queryPagelist" parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
             select * from metoo_version_client a
-            inner join (
-            WITH RECURSIVE Tree AS (
-                SELECT id, name, parent_id
-                FROM metoo_area
-                where unit_id is null
-                <if test="areaId == null and areaId == '' ">
-                    AND parent_id = #{areaId}
-                </if>
-                <if test="areaId != null and areaId != ''">
-                    AND id = #{areaId}
-                </if>
-               and id=1
-                UNION ALL
-                SELECT t.id, t.name, t.parent_id
-                FROM metoo_area t
-                JOIN Tree ON t.parent_id = Tree.id
-                    where   t.unit_id is null
-            )
-            SELECT *
-            FROM Tree
-            ) b
-            on a.area_id =b.id
-        <where>
+        inner join (
+        WITH RECURSIVE Tree AS (
+        SELECT id, name, parent_id
+        FROM metoo_area
+        where 1=1
+        and unit_id is null
+        <if test="areaId != null ">
+            AND id=#{areaId,jdbcType=BIGINT}
+        </if>
+        UNION ALL
+        SELECT t.id, t.name, t.parent_id
+        FROM metoo_area t
+        JOIN Tree ON t.parent_id = Tree.id
+        where unit_id is null
+        )
+        SELECT *
+        FROM Tree
+        ) b on a.area_id=b.id
+       where 1=1
             and a.delete_status=0
-            <if test="unitName != null and unitName != ''">
-                AND a.unit_name like concat(#{unitName},'%')
+            <if test="clientStatus != null">
+                AND a.client_Status =#{clientStatus,jdbcType=BIGINT}
             </if>
-        </where>
+            <if test="versionStatus != null ">
+                AND a.version_Status =#{versionStatus,jdbcType=BIGINT}
+            </if>
+            <if test="unitName != null and unitName != ''">
+                AND a.unit_name like concat(#{unitName,jdbcType=VARCHAR},'%')
+            </if>
         <if test="orderBy != null and orderBy != ''">
             ORDER BY ${orderBy}
         </if>
@@ -92,7 +93,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="unitId != null">
-                #{unitId,jdbcType=VARCHAR},
+                #{unitId,jdbcType=BIGINT},
             </if>
             <if test="unitName != null">
                 #{unitName,jdbcType=VARCHAR},
@@ -143,11 +144,32 @@
     </insert>
     <update id="deleteById" parameterType="java.lang.Long">
       update metoo_version_client set delete_status=1
-      where id = #{id,jdbcType=BIGINT}
+      where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+    <update id="updateAppInfoAndStatus" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set app_version_id=#{appVersionId,jdbcType=BIGINT},
+        app_version=#{appVersion,jdbcType=VARCHAR},version_status=#{versionStatus,jdbcType=TINYINT}
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateAppInfoAndStatusFromClient" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set cur_version_id=#{curVersionId,jdbcType=BIGINT},
+                                        cur_version=#{curVersion,jdbcType=VARCHAR},version_status=#{versionStatus,jdbcType=TINYINT}
+        ,update_time=sysdate()
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+    <update id="updateClientStatus">
+        update metoo_version_client set client_status=#{clientStatus,jdbcType=TINYINT}
+        where unit_id = #{unitId,jdbcType=BIGINT}
     </update>
     <select id="detailById" parameterType="java.lang.Long" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
         select a.* from metoo_version_client a
-           where a.id = #{id,jdbcType=BIGINT}
+           where a.unit_id = #{unitId,jdbcType=BIGINT}
            and a.delete_status=0
     </select>
+    <select id="queryAllList" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
+        select a.* from metoo_version_client a
+        where a.delete_status=0
+    </select>
+
 </mapper>

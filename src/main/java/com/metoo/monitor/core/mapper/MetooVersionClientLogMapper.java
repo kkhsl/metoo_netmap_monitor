@@ -2,6 +2,7 @@ package com.metoo.monitor.core.mapper;
 
 import com.metoo.monitor.core.entity.MetooVersionClientLog;
 import com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo;
+import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -28,5 +29,26 @@ public interface MetooVersionClientLogMapper  {
      * @param log
      * @return
      */
-    boolean save(MetooVersionClientLog log);
+    int save(MetooVersionClientLog log);
+
+    /**
+     * 查询已发布数据
+     * @param unitId
+     * @return
+     */
+    List<MetooVersionClientLog> queryUpdateVersion(Long unitId);
+
+    /**
+     * 获取最新的版本信息
+     * @param unitId
+     * @return
+     */
+    MetooVersionClientLog lastInfo(Long unitId);
+
+    /**
+     * 更新发布状态
+     * @param log
+     * @return
+     */
+    int updateLogStatus(MetooVersionClientLog log);
 }
