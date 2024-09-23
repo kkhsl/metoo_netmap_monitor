@@ -2,7 +2,7 @@ package com.metoo.monitor.core.service;
 
 import cn.hutool.core.lang.tree.Tree;
 import com.github.pagehelper.Page;
-import com.metoo.monitor.core.entity.version.MetooVersionClient;
+import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.vo.version.*;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,6 @@ import java.util.List;
  * @author codeGenerator
  * @since 2024-09-17
  */
-@Service
 public interface IMetooVersionClientService  {
     /**
      * 区域目录树
@@ -58,7 +57,7 @@ public interface IMetooVersionClientService  {
      * @param curVo
      * @return
      */
-    List<MetooVersionClientAppUpdateVo> detectUpdate(MetooVersionClientVo curVo);
+    MetooVersionClientAppUpdateVo detectUpdate(MetooVersionClientVo curVo);
 
     /**
      * 删除客户端版本详情
@@ -66,4 +65,25 @@ public interface IMetooVersionClientService  {
      * @return
      */
     boolean deleteById(Long unitId);
+
+    /**
+     * 更新客户端版本后更新状态
+     * @param clientVo
+     * @return
+     */
+    boolean updateVersionFromClient(MetooVersionClientUpdateVo clientVo);
+
+    /**
+     * 查询所有的客户端数据列表
+     * @return
+     */
+    List<MetooVersionClient> queryAllList();
+
+    /**
+     * 更新客户端状态
+     * @param unitId
+     * @param clientStatus
+     * @return
+     */
+    boolean updateClientStatus(Long unitId,Integer clientStatus);
 }

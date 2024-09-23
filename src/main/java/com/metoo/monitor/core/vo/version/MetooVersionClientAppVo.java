@@ -1,10 +1,12 @@
 package com.metoo.monitor.core.vo.version;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 
 /**
  * <p>
@@ -14,10 +16,11 @@ import java.io.Serializable;
  * @author codeGenerator
  * @since 2024-09-17
  */
+@ApiModel("客户端版本管理")
 @Data
-public class MetooVersionClientAppVo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@AllArgsConstructor
+@NoArgsConstructor
+public class MetooVersionClientAppVo {
 
     @ApiModelProperty("单位编码")
     private Long unitId;

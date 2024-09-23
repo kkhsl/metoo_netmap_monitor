@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.monitor.core.mapper.MetooVersionClientLogMapper">
+    <update id="updateLogStatus" parameterType="com.metoo.monitor.core.entity.MetooVersionClientLog">
+        update metoo_version_client_log
+        set version_status=#{versionStatus,jdbcType=TINYINT}
+        <if test="errorInfo !=null and errorInfo !=''">
+            , error_info=#{errorInfo,jdbcType=VARCHAR}
+        </if>
+        where unit_id=#{unitId,jdbcType=BIGINT}
+            and version_id=#{versionId,jdbcType=BIGINT}
+    </update>
+
+    <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
+            parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo">
+        select a.*,b.`desc` as versionMsg from metoo_version_client_log a
+        left join metoo_application b
+        on a.version_id =b.id
+        where 1=1
+          and a.delete_STATUS=0
+          and a.unit_id=#{unitId,jdbcType=BIGINT}
+       <if test="versionStatus !=null and versionStatus !=''">
+        and a.version_status=#{versionStatus,jdbcType=TINYINT}
+        </if>
+        order by a.add_time desc
+    </select>
+    <select id="lastInfo" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
+            parameterType="java.lang.Long">
+        select a.*,b.version_type  from metoo_version_client_log a
+        left join metoo_application b
+        on a.version_id =b.id
+        where 1=1
+        and a.delete_STATUS=0
+        and a.unit_id=#{unitId,jdbcType=BIGINT}
+        and a.version_status!=3
+        order by a.add_time desc
+        limit 1
+    </select>
+    <select id="queryUpdateVersion" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
+            parameterType="java.lang.Long">
+        select a.* from metoo_version_client_log a
+        where 1=1
+        and a.delete_STATUS=0
+        and a.unit_id=#{unitId,jdbcType=BIGINT}
+        and a.version_status=1
+        order by a.add_time desc
+    </select>
+
+    <insert id="save" parameterType="com.metoo.monitor.core.entity.MetooVersionClientLog">
+        insert into metoo_version_client_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="versionId != null">
+                version_id,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="addTime != null">
+                add_time,
+            </if>
+            <if test="opId != null">
+                op_id,
+            </if>
+            <if test="opName != null">
+                op_name,
+            </if>
+            <if test="versionStatus != null">
+                version_status,
+            </if>
+            <if test="errorInfo != null">
+                error_info,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="versionId != null">
+                #{versionId,jdbcType=BIGINT},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                #{addTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="opId != null">
+                #{opId,jdbcType=BIGINT},
+            </if>
+            <if test="opName != null">
+                #{opName,jdbcType=VARCHAR},
+            </if>
+            <if test="versionStatus != null">
+                #{versionStatus,jdbcType=TINYINT},
+            </if>
+            <if test="errorInfo != null">
+                #{errorInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+</mapper>

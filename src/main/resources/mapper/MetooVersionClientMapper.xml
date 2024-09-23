@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.monitor.core.mapper.MetooVersionClientMapper">
+    <select id="queryPagelist" parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
+            select * from metoo_version_client a
+        inner join (
+        WITH RECURSIVE Tree AS (
+        SELECT id, name, parent_id
+        FROM metoo_area
+        where 1=1
+        and unit_id is null
+        <if test="areaId != null ">
+            AND id=#{areaId,jdbcType=BIGINT}
+        </if>
+        UNION ALL
+        SELECT t.id, t.name, t.parent_id
+        FROM metoo_area t
+        JOIN Tree ON t.parent_id = Tree.id
+        where unit_id is null
+        )
+        SELECT *
+        FROM Tree
+        ) b on a.area_id=b.id
+       where 1=1
+            and a.delete_status=0
+            <if test="clientStatus != null">
+                AND a.client_Status =#{clientStatus,jdbcType=BIGINT}
+            </if>
+            <if test="versionStatus != null ">
+                AND a.version_Status =#{versionStatus,jdbcType=BIGINT}
+            </if>
+            <if test="unitName != null and unitName != ''">
+                AND a.unit_name like concat(#{unitName,jdbcType=VARCHAR},'%')
+            </if>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+    <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        insert into metoo_version_client
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="unitName != null">
+                unit_name,
+            </if>
+            <if test="areaId != null">
+                area_id,
+            </if>
+            <if test="curVersionId != null">
+                cur_version_id,
+            </if>
+            <if test="curVersion != null">
+                cur_version,
+            </if>
+            <if test="appVersionId != null">
+                app_version_id,
+            </if>
+            <if test="appVersion != null">
+                app_version,
+            </if>
+            <if test="clientStatus != null">
+                client_status,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createName != null">
+                create_name,
+            </if>
+            <if test="addTime != null">
+                add_time,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateName != null">
+                update_name,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="versionStatus != null">
+                version_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="unitName != null">
+                #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="areaId != null">
+                #{areaId,jdbcType=BIGINT},
+            </if>
+            <if test="curVersionId != null">
+                #{curVersionId,jdbcType=BIGINT},
+            </if>
+            <if test="curVersion != null">
+                #{curVersion,jdbcType=VARCHAR},
+            </if>
+            <if test="appVersionId != null">
+                #{appVersionId,jdbcType=BIGINT},
+            </if>
+            <if test="appVersion != null">
+                #{appVersion,jdbcType=VARCHAR},
+            </if>
+            <if test="clientStatus != null">
+                #{clientStatus,jdbcType=TINYINT},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createName != null">
+                #{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                #{addTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateName != null">
+                #{updateName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="versionStatus != null">
+                #{versionStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="deleteById" parameterType="java.lang.Long">
+      update metoo_version_client set delete_status=1
+      where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+    <update id="updateAppInfoAndStatus" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set app_version_id=#{appVersionId,jdbcType=BIGINT},
+        app_version=#{appVersion,jdbcType=VARCHAR},version_status=#{versionStatus,jdbcType=TINYINT}
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateAppInfoAndStatusFromClient" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set cur_version_id=#{curVersionId,jdbcType=BIGINT},
+                                        cur_version=#{curVersion,jdbcType=VARCHAR},version_status=#{versionStatus,jdbcType=TINYINT}
+        ,update_time=sysdate()
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+    <update id="updateClientStatus">
+        update metoo_version_client set client_status=#{clientStatus,jdbcType=TINYINT}
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
+    <select id="detailById" parameterType="java.lang.Long" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
+        select a.* from metoo_version_client a
+           where a.unit_id = #{unitId,jdbcType=BIGINT}
+           and a.delete_status=0
+    </select>
+    <select id="queryAllList" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
+        select a.* from metoo_version_client a
+        where a.delete_status=0
+    </select>
+
+</mapper>

@@ -1,8 +1,12 @@
 package com.metoo.monitor.core.entity;
 
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -14,9 +18,11 @@ import lombok.experimental.Accessors;
  * @since 2024-09-18
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class MetooArea implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel("区域类")
+public class MetooArea   {
 
     private static final long serialVersionUID = 1L;
     /**

@@ -80,5 +80,21 @@ public class ApplicationServiceImpl implements IApplicationService {
         return this.applicationMapper.queryList(version);
     }
 
+    /**
+     * 查询版本升级列表（跨版本情况）
+     * @param startId
+     * @param endId
+     * @return
+     */
+    @Override
+    public List<Application> queryUpdateVersions(Long startId, Long endId) {
+        return this.applicationMapper.queryUpdateVersions(startId,endId);
+    }
+
+    @Override
+    public Application queryVersionByName(String version) {
+        return this.applicationMapper.queryVersionByName(version);
+    }
+
 
 }
