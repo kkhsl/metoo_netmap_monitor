@@ -81,7 +81,7 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
      */
     @Override
     public boolean syncSave(MetooAreaSyncVo areaInfo) {
-        // 判断区域编码是否存在
+        // 单位信息同步
         boolean flag = StrUtil.isNotEmpty(areaInfo.getUnitId()) && StrUtil.isNotEmpty(areaInfo.getArea())
                 && StrUtil.isNotEmpty(areaInfo.getUnit()) && StrUtil.isNotEmpty(areaInfo.getCity());
         if (flag) {
@@ -101,15 +101,58 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
                     return this.baseMapper.updateInfo(saveEntity) > 0;
                 }
             } else {
-                //找不到区域信息
-                log.error("找不到区域信息:{}", JSON.toJSONString(areaInfo));
+                // 目录信息保存
+                saveParenInfo(areaInfo.getCity(),areaInfo.getArea());
             }
-        } else {
-            throw new BusiException("同步参数不正确");
+        } else{
+            // 目录信息
+            saveParenInfo(areaInfo.getCity(),areaInfo.getArea());
+
         }
-        return false;
+        return true;
     }
 
+    /**
+     * 保存目录结构信息
+     * @param city
+     * @param area
+     */
+    public void saveParenInfo(String city,String area){
+        if(StrUtil.isEmpty(area)&&StrUtil.isNotEmpty(city)){
+            //根目录信息
+            String path = city + StrUtil.SLASH;
+            List<MetooArea> pathArea = this.baseMapper.queryAreaByPath(path);
+            if (CollectionUtil.isEmpty(pathArea)){
+                // 不存在上级目录
+                MetooArea topArea = new MetooArea();
+                topArea.setName(city);
+                this.baseMapper.saveInfo(topArea);
+            }
+        }else if(StrUtil.isNotEmpty(area)&&StrUtil.isNotEmpty(city)){
+            // 先根据path路径查询所属的路径信息：city+area
+            String parentPath = city+ StrUtil.SLASH+ area + StrUtil.SLASH;
+            List<MetooArea> findAreaList = this.baseMapper.queryAreaByPath(parentPath);
+            if (CollectionUtil.isEmpty(findAreaList)) {
+                // 不存在目录,需要新增目录
+                MetooArea parentArea = new MetooArea();
+                parentArea.setName(area);
+                String path = city + StrUtil.SLASH;
+                List<MetooArea> pathArea = this.baseMapper.queryAreaByPath(path);
+                if (CollectionUtil.isNotEmpty(pathArea)) {
+                    // 存在上级目录
+                    parentArea.setParentId(parentArea.getId());
+                }else{
+                    // 不存在上级目录
+                    MetooArea topArea = new MetooArea();
+                    topArea.setName(city);
+                    int parentId=this.baseMapper.saveInfo(topArea);
+                    parentArea.setParentId((long) parentId);
+                }
+                this.baseMapper.saveInfo(parentArea);
+            }
+        }
+
+    }
     /**
      * 批量保存接口
      *

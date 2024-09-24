@@ -106,8 +106,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         saveEntity.setVersionStatus(VersionStatus.NORMAL.getCode());
         saveEntity.setClientStatus(ClientStatus.ONLINE.getCode());
         saveEntity.setAddTime(DateUtil.date());
-        saveEntity.setCreateBy(currentUser.getId());
-        saveEntity.setCreateName(currentUser.getUsername());
+        //saveEntity.setCreateBy(currentUser.getId());
+        //saveEntity.setCreateName(currentUser.getUsername());
         return clientMapper.saveInfo(saveEntity) > 0;
     }
 
@@ -165,8 +165,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         logEntity.setUnitId(appVo.getUnitId());
         logEntity.setVersionId(appVo.getAppVersionId());
         logEntity.setVersion(appVo.getAppVersion());
-        logEntity.setOpId(currentUser.getId());
-        logEntity.setOpName(currentUser.getUsername());
+        //logEntity.setOpId(currentUser.getId());
+        //logEntity.setOpName(currentUser.getUsername());
         clientLogService.saveLog(logEntity);
         //更新客户段版本记录为未完成状态、指定版本信息
         MetooVersionClient updateInfo = Convert.convert(MetooVersionClient.class, appVo);
