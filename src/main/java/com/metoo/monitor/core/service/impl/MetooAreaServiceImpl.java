@@ -119,7 +119,13 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
     @Override
     public boolean syncBatchArea(List<MetooAreaSyncVo> areaInfos) {
         if (CollectionUtil.isNotEmpty(areaInfos)) {
-            areaInfos.forEach(this::syncSave);
+            for (MetooAreaSyncVo areaInfo : areaInfos) {
+                try {
+                    syncSave(areaInfo);
+                } catch (Exception e) {
+                    log.error("批量保存失败：{}", JSON.toJSONString(areaInfo));
+                }
+            }
         }
         return true;
     }

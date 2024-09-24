@@ -182,6 +182,17 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
      */
     @Override
     public MetooVersionClientAppUpdateVo detectUpdate(MetooVersionClientVo curVo) {
+        if (StrUtil.isNotEmpty(curVo.getCurVersion())) {
+            //根据版本号获取版本编码
+            Application application = applicationService.queryVersionByName(curVo.getCurVersion());
+            if (null != application) {
+                curVo.setCurVersionId(application.getId());
+            } else {
+                log.error("当前版本信息不存在：{}", curVo.getCurVersion());
+                //默认当前版本id为1
+                curVo.setCurVersionId(1L);
+            }
+        }
         // 检测更新逻辑
         // 查询当前客户端是否存在已发布的版本数据
         List<MetooVersionClientLog> versionList = clientLogService.queryUpdateVersion(curVo.getUnitId());
