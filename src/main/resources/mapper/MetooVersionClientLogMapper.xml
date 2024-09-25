@@ -13,7 +13,7 @@
 
     <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
             parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo">
-        select a.*,b.`desc` as versionMsg from metoo_version_client_log a
+        select a.*,b.`desc` as versionRemark from metoo_version_client_log a
         left join metoo_application b
         on a.version_id =b.id
         where 1=1

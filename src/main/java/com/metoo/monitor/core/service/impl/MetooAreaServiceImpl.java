@@ -17,7 +17,6 @@ import com.metoo.monitor.core.vo.MetooAreaVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +80,7 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
      */
     @Override
     public boolean syncSave(MetooAreaSyncVo areaInfo) {
-        // 判断区域编码是否存在
+        // 单位信息同步
         boolean flag = StrUtil.isNotEmpty(areaInfo.getUnitId()) && StrUtil.isNotEmpty(areaInfo.getArea())
                 && StrUtil.isNotEmpty(areaInfo.getUnit()) && StrUtil.isNotEmpty(areaInfo.getCity());
         if (flag) {
@@ -95,19 +94,71 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
                 saveEntity.setParentId(findAreaList.get(0).getId());
                 if (area == null) {
                     //不存在则新增
-                    return this.baseMapper.saveInfo(saveEntity) > 0;
+                    this.baseMapper.saveInfo(saveEntity);
                 } else {
                     //存在则更新操作
-                    return this.baseMapper.updateInfo(saveEntity) > 0;
+                    this.baseMapper.updateInfo(saveEntity);
                 }
             } else {
-                //找不到区域信息
-                log.error("找不到区域信息:{}", JSON.toJSONString(areaInfo));
+                // 目录信息保存
+                Long parentId = saveParenInfo(areaInfo.getCity(), areaInfo.getArea());
+                MetooArea saveAll = Convert.convert(MetooArea.class, areaInfo);
+                saveAll.setName(areaInfo.getUnit());
+                saveAll.setParentId(parentId);
+                //新增叶子节点
+                this.baseMapper.saveInfo(saveAll);
             }
         } else {
-            throw new BusiException("同步参数不正确");
+            // 目录信息
+            saveParenInfo(areaInfo.getCity(), areaInfo.getArea());
+
         }
-        return false;
+        return true;
+    }
+
+    /**
+     * 保存目录结构信息
+     *
+     * @param city
+     * @param area
+     */
+    public Long saveParenInfo(String city, String area) {
+        Long parentId = 0L;
+        if (StrUtil.isEmpty(area) && StrUtil.isNotEmpty(city)) {
+            //根目录信息
+            String path = city + StrUtil.SLASH;
+            List<MetooArea> pathArea = this.baseMapper.queryAreaByPath(path);
+            if (CollectionUtil.isEmpty(pathArea)) {
+                // 不存在上级目录
+                MetooArea topArea = new MetooArea();
+                topArea.setName(city);
+                this.baseMapper.saveInfo(topArea);
+            }
+        } else if (StrUtil.isNotEmpty(area) && StrUtil.isNotEmpty(city)) {
+            // 先根据path路径查询所属的路径信息：city+area
+            String parentPath = city + StrUtil.SLASH + area + StrUtil.SLASH;
+            List<MetooArea> findAreaList = this.baseMapper.queryAreaByPath(parentPath);
+            if (CollectionUtil.isEmpty(findAreaList)) {
+                // 不存在目录,需要新增目录
+                MetooArea parentArea = new MetooArea();
+                parentArea.setName(area);
+                String path = city + StrUtil.SLASH;
+                List<MetooArea> pathArea = this.baseMapper.queryAreaByPath(path);
+                if (CollectionUtil.isNotEmpty(pathArea)) {
+                    // 存在上级目录
+                    parentArea.setParentId(parentArea.getId());
+                } else {
+                    // 不存在上级目录
+                    MetooArea topArea = new MetooArea();
+                    topArea.setName(city);
+                    this.baseMapper.saveInfo(topArea);
+                    parentArea.setParentId(topArea.getId());
+                }
+                this.baseMapper.saveInfo(parentArea);
+                parentId = parentArea.getId();
+            }
+        }
+        return parentId;
     }
 
     /**
@@ -139,11 +190,17 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
     private List<Tree<Long>> beanConvertTreeNode(List<MetooArea> areaList) {
         List<TreeNode<Long>> collect = areaList.stream().map(itemDO -> {
             Map<String, Object> map = new HashMap<>(8);
-            TreeNode<Long> treeNode = new TreeNode<Long>().setId(itemDO.getId())
-                    .setName(itemDO.getName())
-                    .setParentId(itemDO.getParentId() == null ? ROOT_ID : itemDO.getParentId())
-                    .setExtra(map);
-            return treeNode;
+            if (null == itemDO.getParentId()) {
+                return new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(ROOT_ID)
+                        .setExtra(map);
+            } else {
+                return new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(itemDO.getParentId())
+                        .setExtra(map);
+            }
         }).collect(Collectors.toList());
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();

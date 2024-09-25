@@ -37,26 +37,26 @@
     <select id="queryAreaByPath" resultType="com.metoo.monitor.core.entity.MetooArea"
             parameterType="java.lang.String">
         select * from (
-                WITH RECURSIVE category_path (id, name, path, depth) AS (
-          SELECT id,
-                 name,
-                 CONCAT(name, '/') AS path,
-                 1 AS depth
-          FROM metoo_area ma
-          WHERE parent_id =0
-        UNION ALL
-          SELECT c.id,
-                 c.name,
-                 CONCAT(cp.path, c.name, '/') AS path,
-                 depth + 1
-          FROM category_path AS cp
-          JOIN metoo_area AS c ON cp.id = c.parent_id
-          and c.unit_id is null )
-        SELECT * FROM category_path) a
-        where a.path=#{name}
+        WITH RECURSIVE category_path (id, name, path, depth) AS (
+  SELECT id,
+         name,
+         CONCAT(name, '/') AS path,
+         1 AS depth
+  FROM metoo_area ma
+  WHERE parent_id is null
+UNION ALL
+  SELECT c.id,
+         c.name,
+         CONCAT(cp.path, c.name, '/') AS path,
+         depth + 1
+  FROM category_path AS cp
+  JOIN metoo_area AS c ON cp.id = c.parent_id
+  and c.unit_id is null )
+SELECT * FROM category_path) a
+where a.path=#{name}
     </select>
 
-    <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooArea">
+    <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooArea" useGeneratedKeys="true" keyProperty="id">
         insert into metoo_area
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">

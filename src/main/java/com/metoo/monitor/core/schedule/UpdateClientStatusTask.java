@@ -36,7 +36,7 @@ public class UpdateClientStatusTask {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(DateTime.now());
         // 将时间减少一个小时
-        calendar.add(Calendar.HOUR, -12);
+        calendar.add(Calendar.HOUR, -1);
         List<MetooVersionClient> allClients = versionClientService.queryAllList();
         if (CollectionUtils.isNotEmpty(allClients)) {
             allClients.forEach(client -> {

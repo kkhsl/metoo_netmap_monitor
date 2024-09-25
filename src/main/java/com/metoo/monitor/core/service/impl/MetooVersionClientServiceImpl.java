@@ -106,8 +106,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         saveEntity.setVersionStatus(VersionStatus.NORMAL.getCode());
         saveEntity.setClientStatus(ClientStatus.ONLINE.getCode());
         saveEntity.setAddTime(DateUtil.date());
-        saveEntity.setCreateBy(currentUser.getId());
-        saveEntity.setCreateName(currentUser.getUsername());
+        //saveEntity.setCreateBy(currentUser.getId());
+        //saveEntity.setCreateName(currentUser.getUsername());
         return clientMapper.saveInfo(saveEntity) > 0;
     }
 
@@ -165,8 +165,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         logEntity.setUnitId(appVo.getUnitId());
         logEntity.setVersionId(appVo.getAppVersionId());
         logEntity.setVersion(appVo.getAppVersion());
-        logEntity.setOpId(currentUser.getId());
-        logEntity.setOpName(currentUser.getUsername());
+        //logEntity.setOpId(currentUser.getId());
+        //logEntity.setOpName(currentUser.getUsername());
         clientLogService.saveLog(logEntity);
         //更新客户段版本记录为未完成状态、指定版本信息
         MetooVersionClient updateInfo = Convert.convert(MetooVersionClient.class, appVo);
@@ -309,7 +309,6 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     public boolean updateClientStatus(Long unitId, Integer clientStatus) {
         return this.clientMapper.updateClientStatus(unitId, clientStatus) > 0;
     }
-
     /**
      * 区域实体转树节点列表
      *
@@ -319,11 +318,17 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     private List<Tree<Long>> beanConvertTreeNode(List<MetooArea> areaList) {
         List<TreeNode<Long>> collect = areaList.stream().map(itemDO -> {
             Map<String, Object> map = new HashMap<>(8);
-            TreeNode<Long> treeNode = new TreeNode<Long>().setId(itemDO.getId())
-                    .setName(itemDO.getName())
-                    .setParentId(itemDO.getParentId() == null ? ROOT_ID : itemDO.getParentId())
-                    .setExtra(map);
-            return treeNode;
+            if(null==itemDO.getParentId()){
+                return  new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(ROOT_ID)
+                        .setExtra(map);
+            }else{
+                return  new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(itemDO.getParentId())
+                        .setExtra(map);
+            }
         }).collect(Collectors.toList());
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();

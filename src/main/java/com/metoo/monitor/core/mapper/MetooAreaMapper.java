@@ -46,7 +46,7 @@ public interface MetooAreaMapper {
      * @param vo
      * @return
      */
-    int saveInfo(MetooArea vo);
+    void saveInfo(MetooArea vo);
 
     /**
      * 更新区域信息
