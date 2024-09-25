@@ -43,7 +43,7 @@
          CONCAT(name, '/') AS path,
          1 AS depth
   FROM metoo_area ma
-  WHERE parent_id =0
+  WHERE parent_id is null
 UNION ALL
   SELECT c.id,
          c.name,
@@ -56,7 +56,7 @@ SELECT * FROM category_path) a
 where a.path=#{name}
     </select>
 
-    <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooArea">
+    <insert id="saveInfo" parameterType="com.metoo.monitor.core.entity.MetooArea" useGeneratedKeys="true" keyProperty="id">
         insert into metoo_area
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">

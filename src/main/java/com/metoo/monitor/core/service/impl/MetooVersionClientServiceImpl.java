@@ -309,7 +309,6 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     public boolean updateClientStatus(Long unitId, Integer clientStatus) {
         return this.clientMapper.updateClientStatus(unitId, clientStatus) > 0;
     }
-
     /**
      * 区域实体转树节点列表
      *
@@ -319,11 +318,17 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     private List<Tree<Long>> beanConvertTreeNode(List<MetooArea> areaList) {
         List<TreeNode<Long>> collect = areaList.stream().map(itemDO -> {
             Map<String, Object> map = new HashMap<>(8);
-            TreeNode<Long> treeNode = new TreeNode<Long>().setId(itemDO.getId())
-                    .setName(itemDO.getName())
-                    .setParentId(itemDO.getParentId() == null ? ROOT_ID : itemDO.getParentId())
-                    .setExtra(map);
-            return treeNode;
+            if(null==itemDO.getParentId()){
+                return  new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(ROOT_ID)
+                        .setExtra(map);
+            }else{
+                return  new TreeNode<Long>().setId(itemDO.getId())
+                        .setName(itemDO.getName())
+                        .setParentId(itemDO.getParentId())
+                        .setExtra(map);
+            }
         }).collect(Collectors.toList());
         //配置
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
