@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class AccessoryServiceImpl implements IAccessoryService {
 
     @Override
     public int save(Accessory instance) {
+        instance.setAddTime(new Date());
         return this.accessoryMapper.save(instance);
     }
 
