@@ -6,6 +6,7 @@ import com.metoo.monitor.core.service.IMetooVersionClientService;
 import com.metoo.monitor.core.utils.ResponseUtil;
 import com.metoo.monitor.core.vo.ApiPageInfo;
 import com.metoo.monitor.core.vo.Result;
+import com.metoo.monitor.core.vo.version.MetooVersionClientAppBatchVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientAppVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientVo;
@@ -82,7 +83,7 @@ public class MetooVersionClientController {
             if (success) {
                 return ResponseUtil.ok();
             } else {
-                return ResponseUtil.fail("删除客户端版本不成功");
+                return ResponseUtil.fail("删除客户端版本失败");
             }
         } catch (Exception e) {
             log.error("删除客户端版本出现问题：{}", e);
@@ -98,12 +99,26 @@ public class MetooVersionClientController {
             if (success) {
                 return ResponseUtil.ok();
             } else {
-                return ResponseUtil.fail("发布客户端版本本不成功");
+                return ResponseUtil.fail("发布客户端版本失败");
             }
         } catch (Exception e) {
             log.error("发布客户端版本出现问题：{}", e);
             return ResponseUtil.fail(e.getMessage());
         }
     }
-
+    @PostMapping("/batchPublish")
+    @ApiOperation(value = "批量发布客户端版本", notes = "发布客户端版本")
+    public Result batchPublish(@RequestBody @Validated MetooVersionClientAppBatchVo appVos) {
+        try {
+            boolean success = metooVersionClientService.batchPublish(appVos);
+            if (success) {
+                return ResponseUtil.ok();
+            } else {
+                return ResponseUtil.fail("批量发布客户端版本失败");
+            }
+        } catch (Exception e) {
+            log.error("批量发布客户端版本出现问题：{}", e);
+            return ResponseUtil.fail(e.getMessage());
+        }
+    }
 }

@@ -92,7 +92,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
      */
     @Override
     public boolean save(MetooVersionClientVo versionClientVo) {
-        if(null==versionClientVo.getUnitId()){
+        if (null == versionClientVo.getUnitId()) {
             throw new BusiException("单位编码不能为空");
         }
         // 判断客户端是否存在
@@ -134,10 +134,10 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean publish(MetooVersionClientAppVo appVo) {
-        if(null==appVo.getUnitId()){
+        if (null == appVo.getUnitId()) {
             throw new BusiException("单位编码不能为空");
         }
-        if(null==appVo.getAppVersionId()){
+        if (null == appVo.getAppVersionId()) {
             throw new BusiException("指定版本不能为空");
         }
         // 发布逻辑
@@ -176,6 +176,47 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     }
 
     /**
+     * 批量发布
+     *
+     * @param appVos
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchPublish(MetooVersionClientAppBatchVo appVos) {
+        if (CollectionUtil.isEmpty(appVos.getUnitIds())) {
+            throw new BusiException("单位编码不能为空");
+        }
+        if (null == appVos.getAppVersionId()) {
+            throw new BusiException("指定版本不能为空");
+        }
+        // 当前用用户信息
+        User currentUser = ShiroUserHolder.currentUser();
+        // 新增版本记录，为待发布状态
+        List<MetooVersionClientLog> logs = CollectionUtil.newArrayList();
+        appVos.getUnitIds().forEach(o -> {
+            MetooVersionClientLog logEntity = MetooVersionClientLog.builder().build();
+            logEntity.setUnitId(o);
+            logEntity.setVersionId(appVos.getAppVersionId());
+            logEntity.setVersion(appVos.getAppVersion());
+            logEntity.setOpId(currentUser.getId());
+            logEntity.setOpName(currentUser.getUsername());
+            logs.add(logEntity);
+            //更新客户段版本记录为未完成状态、指定版本信息
+            MetooVersionClient updateInfo = Convert.convert(MetooVersionClient.class, logEntity);
+            updateInfo.setAppVersionId(appVos.getAppVersionId());
+            updateInfo.setAppVersion(appVos.getAppVersion());
+            updateInfo.setVersionStatus(VersionStatus.ABNORMAL.getCode());
+            clientMapper.updateAppInfoAndStatus(updateInfo);
+        });
+        //批量删除已发布的版本信息
+        clientLogService.batchUpdate(appVos);
+        // 批量插入新版本信息
+        clientLogService.batchPublish(logs);
+        return true;
+    }
+
+    /**
      * 检测更新逻辑
      *
      * @param curVo
@@ -195,8 +236,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             }
         }
         // 每次检测时，需更新版本信息及最新更新时间
-        ThreadUtil.execAsync(()->{
-            updateVersionAndTime(curVo.getCurVersionId(),curVo.getCurVersion(),curVo.getUnitId());
+        ThreadUtil.execAsync(() -> {
+            updateVersionAndTime(curVo.getCurVersionId(), curVo.getCurVersion(), curVo.getUnitId());
         });
         // 检测更新逻辑
         // 查询当前客户端是否存在已发布的版本数据
@@ -234,7 +275,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
      */
     @Override
     public boolean deleteById(Long unitId) {
-        if(null==unitId){
+        if (null == unitId) {
             throw new BusiException("单位编码不能为空");
         }
         // 是否能删除逻辑判断
@@ -300,20 +341,24 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
 
     /**
      * 查询客户端状态
+     *
      * @return
      */
     @Override
     public List<MetooVersionClient> queryAllList() {
         return this.clientMapper.queryAllList();
     }
+
     /**
      * 更新客户端状态
+     *
      * @return
      */
     @Override
     public boolean updateClientStatus(Long unitId, Integer clientStatus) {
         return this.clientMapper.updateClientStatus(unitId, clientStatus) > 0;
     }
+
     /**
      * 区域实体转树节点列表
      *
@@ -323,13 +368,13 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     private List<Tree<Long>> beanConvertTreeNode(List<MetooArea> areaList) {
         List<TreeNode<Long>> collect = areaList.stream().map(itemDO -> {
             Map<String, Object> map = new HashMap<>(8);
-            if(null==itemDO.getParentId()){
-                return  new TreeNode<Long>().setId(itemDO.getId())
+            if (null == itemDO.getParentId()) {
+                return new TreeNode<Long>().setId(itemDO.getId())
                         .setName(itemDO.getName())
                         .setParentId(ROOT_ID)
                         .setExtra(map);
-            }else{
-                return  new TreeNode<Long>().setId(itemDO.getId())
+            } else {
+                return new TreeNode<Long>().setId(itemDO.getId())
                         .setName(itemDO.getName())
                         .setParentId(itemDO.getParentId())
                         .setExtra(map);
@@ -352,11 +397,12 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
 
     /**
      * 更新客户端版本信息到服务器（每隔一个小时）
+     *
      * @param curVersion
      * @param unitId
      */
-    public void updateVersionAndTime(Long curVersionId,String curVersion,Long unitId){
-        MetooVersionClient updateInfo =new MetooVersionClient();
+    public void updateVersionAndTime(Long curVersionId, String curVersion, Long unitId) {
+        MetooVersionClient updateInfo = new MetooVersionClient();
         updateInfo.setUnitId(unitId);
         updateInfo.setCurVersionId(curVersionId);
         updateInfo.setCurVersion(curVersion);

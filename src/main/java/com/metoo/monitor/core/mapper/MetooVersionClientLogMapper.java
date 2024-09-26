@@ -51,4 +51,19 @@ public interface MetooVersionClientLogMapper  {
      * @return
      */
     int updateLogStatus(MetooVersionClientLog log);
+
+    /**
+     * 批量发布
+     * @param logs
+     * @return
+     */
+    int batchInsert(List<MetooVersionClientLog> logs);
+
+    /**
+     * 批量更新
+     * @param ids
+     * @param version
+     * @return
+     */
+    int batchUpdate(@Param("ids") List<Long> ids,@Param("version") String version);
 }

@@ -2,6 +2,7 @@ package com.metoo.monitor.core.service;
 
 import com.github.pagehelper.Page;
 import com.metoo.monitor.core.entity.MetooVersionClientLog;
+import com.metoo.monitor.core.vo.version.MetooVersionClientAppBatchVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo;
 import org.springframework.stereotype.Service;
 
@@ -50,4 +51,18 @@ public interface IMetooVersionClientLogService  {
      * @return
      */
     boolean updateLogStatus(MetooVersionClientLog logEntity);
+
+    /**
+     * 批量发布
+     * @param batchVos
+     * @return
+     */
+    boolean batchPublish(List<MetooVersionClientLog> batchVos);
+
+    /**
+     * 批量删除之前已发布的版本日志
+     * @param vo
+     * @return
+     */
+    boolean batchUpdate(MetooVersionClientAppBatchVo vo);
 }

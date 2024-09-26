@@ -51,6 +51,12 @@ public interface IMetooVersionClientService  {
      * @return
      */
     boolean publish(MetooVersionClientAppVo appVo);
+    /**
+     * 发布指定版本-批量发布
+     * @param appVos
+     * @return
+     */
+    boolean batchPublish(MetooVersionClientAppBatchVo appVos);
 
     /**
      * 检查更新
