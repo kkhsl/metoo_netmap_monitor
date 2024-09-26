@@ -67,7 +67,7 @@
                 `desc`,
             </if>
             <if test="versionType != null ">
-                versio_type,
+                version_type,
             </if>
             <if test="accessoryId != null and accessoryId != ''">
                 accessoryId,
