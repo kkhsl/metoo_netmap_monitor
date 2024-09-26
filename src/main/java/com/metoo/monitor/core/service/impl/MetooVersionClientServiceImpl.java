@@ -203,7 +203,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         List<MetooVersionClientLog> versionList = clientLogService.queryUpdateVersion(curVo.getUnitId());
         if (CollectionUtil.isNotEmpty(versionList)) {
             MetooVersionClientLog lastInfo = versionList.get(0);
-            // TODO: 2024/9/20 版本是否存在跨版本的情况，如果是增量版本需要一个个升级操作
+            // 版本是否存在跨版本的情况，如果是增量版本需要一个个升级操作
             List<Application> appList = applicationService.queryUpdateVersions(curVo.getCurVersionId(), lastInfo.getVersionId());
             if (CollectionUtil.isNotEmpty(appList)) {
                 if (appList.size() == 1) {
@@ -265,14 +265,14 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                 clientVo.setCurVersionId(application.getId());
             } else {
                 log.error("当前版本信息不存在：{}", clientVo.getCurVersion());
-                return false;
             }
         }
         MetooVersionClient updateInfo = Convert.convert(MetooVersionClient.class, clientVo);
         MetooVersionClientLog logEntity = Convert.convert(MetooVersionClientLog.class, clientVo);
         // 根据单位id查询现在版本信息
         MetooVersionClient lastInfo = clientMapper.detailById(clientVo.getUnitId());
-        logEntity.setVersionId(lastInfo.getAppVersionId());
+        // 更加当前版本号更新
+        logEntity.setVersion(clientVo.getCurVersion());
         if (null != lastInfo) {
             if (null == lastInfo.getAppVersion()) {
                 //默认状态

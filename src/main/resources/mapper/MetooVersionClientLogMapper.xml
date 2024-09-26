@@ -8,7 +8,8 @@
             , error_info=#{errorInfo,jdbcType=VARCHAR}
         </if>
         where unit_id=#{unitId,jdbcType=BIGINT}
-            and version_id=#{versionId,jdbcType=BIGINT}
+            and version=#{version,jdbcType=VARCHAR}
+            and version_status=1
     </update>
 
     <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
