@@ -7,6 +7,7 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -193,6 +194,10 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                 curVo.setCurVersionId(1L);
             }
         }
+        // 每次检测时，需更新版本信息及最新更新时间
+        ThreadUtil.execAsync(()->{
+            updateVersionAndTime(curVo.getCurVersionId(),curVo.getCurVersion(),curVo.getUnitId());
+        });
         // 检测更新逻辑
         // 查询当前客户端是否存在已发布的版本数据
         List<MetooVersionClientLog> versionList = clientLogService.queryUpdateVersion(curVo.getUnitId());
@@ -343,5 +348,33 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                     tree.setName(treeNode.getName());
                 });
         return treeNodes;
+    }
+
+    /**
+     * 更新客户端版本信息到服务器（每隔一个小时）
+     * @param curVersion
+     * @param unitId
+     */
+    public void updateVersionAndTime(Long curVersionId,String curVersion,Long unitId){
+        MetooVersionClient updateInfo =new MetooVersionClient();
+        updateInfo.setUnitId(unitId);
+        updateInfo.setCurVersionId(curVersionId);
+        updateInfo.setCurVersion(curVersion);
+        // 根据单位id查询现在版本信息
+        MetooVersionClient lastInfo = clientMapper.detailById(unitId);
+        if (null != lastInfo) {
+            if (null == lastInfo.getAppVersion()) {
+                //默认状态
+                updateInfo.setVersionStatus(VersionStatus.NORMAL.getCode());
+            } else {
+                // 存在升级版本
+                if (!lastInfo.getAppVersion().equals(curVersion)) {
+                    updateInfo.setVersionStatus(VersionStatus.ABNORMAL.getCode());
+                } else {
+                    updateInfo.setVersionStatus(VersionStatus.NORMAL.getCode());
+                }
+            }
+            clientMapper.updateAppInfoAndStatusFromClient(updateInfo);
+        }
     }
 }
