@@ -4,9 +4,7 @@ import cn.hutool.core.lang.tree.Tree;
 import com.github.pagehelper.Page;
 import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.vo.version.*;
-import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -51,6 +49,12 @@ public interface IMetooVersionClientService  {
      * @return
      */
     boolean publish(MetooVersionClientAppVo appVo);
+    /**
+     * 发布指定版本-批量发布
+     * @param appVos
+     * @return
+     */
+    boolean batchPublish(MetooVersionClientAppBatchVo appVos);
 
     /**
      * 检查更新
@@ -86,4 +90,10 @@ public interface IMetooVersionClientService  {
      * @return
      */
     boolean updateClientStatus(Long unitId,Integer clientStatus);
+
+    /**
+     * 全网版本发布
+     * @param allVo
+     */
+    void allPublish(MetooVersionClientAppBatchVo allVo);
 }

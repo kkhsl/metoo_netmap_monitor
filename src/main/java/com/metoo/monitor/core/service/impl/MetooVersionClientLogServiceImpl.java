@@ -7,6 +7,7 @@ import com.metoo.monitor.core.entity.MetooVersionClientLog;
 import com.metoo.monitor.core.enums.VersionLogStatus;
 import com.metoo.monitor.core.mapper.MetooVersionClientLogMapper;
 import com.metoo.monitor.core.service.IMetooVersionClientLogService;
+import com.metoo.monitor.core.vo.version.MetooVersionClientAppBatchVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,5 +74,25 @@ public class MetooVersionClientLogServiceImpl implements IMetooVersionClientLogS
     @Override
     public boolean updateLogStatus(MetooVersionClientLog logEntity) {
         return this.baseMapper.updateLogStatus(logEntity)>0;
+    }
+
+    /**
+     * 批量发布
+     * @param batchVo
+     * @return
+     */
+    @Override
+    public boolean batchPublish(List<MetooVersionClientLog> batchVo) {
+        return this.baseMapper.batchInsert(batchVo)>0;
+    }
+
+    /**
+     * 批量删除之前已发布的版本
+     * @param vo
+     * @return
+     */
+    @Override
+    public boolean batchUpdate(MetooVersionClientAppBatchVo vo) {
+        return this.baseMapper.batchUpdate(vo.getUnitIds(),vo.getAppVersion())>0;
     }
 }

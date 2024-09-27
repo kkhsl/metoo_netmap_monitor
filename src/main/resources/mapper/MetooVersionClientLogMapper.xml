@@ -8,7 +8,9 @@
             , error_info=#{errorInfo,jdbcType=VARCHAR}
         </if>
         where unit_id=#{unitId,jdbcType=BIGINT}
-            and version_id=#{versionId,jdbcType=BIGINT}
+            and version=#{version,jdbcType=VARCHAR}
+            and version_status=1
+            and delete_status=0
     </update>
 
     <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
@@ -108,4 +110,32 @@
             </if>
         </trim>
     </insert>
+
+    <insert id="batchInsert">
+        insert into metoo_version_client_log
+           ( unit_id,
+            version_id,
+            version,
+            add_time,
+            op_id,
+            op_name,
+         version_status
+        )
+        values
+        <foreach collection="list" item="param"  separator="," close=";">
+            (#{param.unitId}, #{param.versionId}, #{param.version},sysdate(),#{param.opId},#{param.opName},1)
+        </foreach>
+    </insert>
+    <update id="batchUpdate">
+        update metoo_version_client_log
+        set delete_status=1
+        where 1=1
+        and delete_status=0
+        and version=#{version,jdbcType=VARCHAR}
+        and version_status=1
+        and unit_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+        #{id}
+        </foreach>
+    </update>
 </mapper>
