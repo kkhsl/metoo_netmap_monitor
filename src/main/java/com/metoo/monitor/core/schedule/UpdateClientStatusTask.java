@@ -1,6 +1,7 @@
 package com.metoo.monitor.core.schedule;
 
 import cn.hutool.core.date.DateTime;
+import com.google.common.collect.Lists;
 import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.enums.ClientStatus;
 import com.metoo.monitor.core.service.IMetooVersionClientService;
@@ -39,15 +40,22 @@ public class UpdateClientStatusTask {
         calendar.add(Calendar.HOUR, -1);
         List<MetooVersionClient> allClients = versionClientService.queryAllList();
         if (CollectionUtils.isNotEmpty(allClients)) {
-            allClients.forEach(client -> {
-                if (null != client.getUpdateTime() && client.getUpdateTime().after(calendar.getTime())) {
-                    //最近更新时间在12小时之内，说明客户端在线了
-                    versionClientService.updateClientStatus(client.getUnitId(), ClientStatus.ONLINE.getCode());
-                } else {
-                    // 更新客户端状态为离线
-                    versionClientService.updateClientStatus(client.getUnitId(), ClientStatus.OFFLINE.getCode());
-                }
-            });
+            List< List<MetooVersionClient>> newList = Lists.partition(allClients, 150);
+            for (List<MetooVersionClient> subList:newList) {
+                subList.forEach(client -> {
+                    try {
+                        if (null != client.getUpdateTime() && client.getUpdateTime().after(calendar.getTime())) {
+                            //最近更新时间在1小时之内，说明客户端在线了
+                            versionClientService.updateClientStatus(client.getUnitId(), ClientStatus.ONLINE.getCode());
+                        } else {
+                            // 更新客户端状态为离线
+                            versionClientService.updateClientStatus(client.getUnitId(), ClientStatus.OFFLINE.getCode());
+                        }
+                    }catch (Exception ex){
+                        log.error("更新客户端状态定时任务出现错误：{}",ex);
+                    }
+                });
+            }
         }
         log.info("====================================更新客户端状态定时任务结束==========================");
     }

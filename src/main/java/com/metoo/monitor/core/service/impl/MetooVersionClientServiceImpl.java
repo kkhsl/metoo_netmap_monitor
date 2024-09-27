@@ -11,6 +11,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import com.metoo.monitor.core.entity.*;
 import com.metoo.monitor.core.enums.ClientStatus;
 import com.metoo.monitor.core.enums.VersionLogStatus;
@@ -199,8 +200,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             logEntity.setUnitId(o);
             logEntity.setVersionId(appVos.getAppVersionId());
             logEntity.setVersion(appVos.getAppVersion());
-            logEntity.setOpId(currentUser.getId());
-            logEntity.setOpName(currentUser.getUsername());
+            // logEntity.setOpId(currentUser.getId());
+            // logEntity.setOpName(currentUser.getUsername());
             logs.add(logEntity);
             //更新客户段版本记录为未完成状态、指定版本信息
             MetooVersionClient updateInfo = Convert.convert(MetooVersionClient.class, logEntity);
@@ -258,10 +259,27 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                         return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(app.getId()).appVersion(app.getVersion()).build();
                     } else {
                         //多个版本情况，需倒序升级
-                        Application tempApp = appList.get(appList.size() - 1);
-                        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(tempApp.getId()).appVersion(tempApp.getVersion()).build();
+                        return getLastVersionByUpdate(appList, curVo.getCurVersion(), curVo.getUnitId());
                     }
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取倒序去最新的版本
+     *
+     * @param appList
+     * @param curVersion
+     * @return
+     */
+    private MetooVersionClientAppUpdateVo getLastVersionByUpdate(List<Application> appList, String curVersion, Long unitId) {
+        for (int i = appList.size() - 1; i >= 0; i--) {
+            Application tempApp = appList.get(i);
+            if (!curVersion.equals(tempApp.getVersion())) {
+                // 和当前版本不一致，才推送
+                return MetooVersionClientAppUpdateVo.builder().unitId(unitId).appVersionId(tempApp.getId()).appVersion(tempApp.getVersion()).build();
             }
         }
         return null;
@@ -357,6 +375,32 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
     @Override
     public boolean updateClientStatus(Long unitId, Integer clientStatus) {
         return this.clientMapper.updateClientStatus(unitId, clientStatus) > 0;
+    }
+
+    /**
+     * 全网发布客户端版本
+     *
+     * @param allVo
+     */
+    @Override
+    public void allPublish(MetooVersionClientAppBatchVo allVo) {
+        if (null == allVo.getAppVersionId()) {
+            throw new BusiException("指定版本不能为空");
+        }
+        ThreadUtil.execAsync(() -> {
+            //获取所有单位信息
+            List<MetooVersionClient> allList = this.queryAllList();
+            List<List<MetooVersionClient>> newList = Lists.partition(allList, 150);
+            for (List<MetooVersionClient> subList : newList) {
+                allVo.setUnitIds(subList.stream().map(MetooVersionClient::getUnitId).collect(Collectors.toList()));
+              try {
+                  this.batchPublish(allVo);
+              }catch (Exception ex){
+                  log.error("全网发布客户端版本出错：{}", ex);
+              }
+            }
+        });
+
     }
 
     /**

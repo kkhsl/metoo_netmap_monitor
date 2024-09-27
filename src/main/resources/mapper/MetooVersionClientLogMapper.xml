@@ -123,7 +123,7 @@
         )
         values
         <foreach collection="list" item="param"  separator="," close=";">
-            (#{param.unitId}, #{param.versionId}, #{param.version},sysdate(),#{param.opId},#{opName},1)
+            (#{param.unitId}, #{param.versionId}, #{param.version},sysdate(),#{param.opId},#{param.opName},1)
         </foreach>
     </insert>
     <update id="batchUpdate">
@@ -133,8 +133,8 @@
         and delete_status=0
         and version=#{version,jdbcType=VARCHAR}
         and version_status=1
-        and id in
-        <foreach item="id" collection="list" open="(" separator="," close=")">
+        and unit_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
         #{id}
         </foreach>
     </update>

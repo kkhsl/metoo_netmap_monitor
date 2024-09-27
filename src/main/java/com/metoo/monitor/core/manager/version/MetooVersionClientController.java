@@ -121,4 +121,15 @@ public class MetooVersionClientController {
             return ResponseUtil.fail(e.getMessage());
         }
     }
+    @PostMapping("/allPublish")
+    @ApiOperation(value = "全网发布客户端版本", notes = "全网发布客户端版本")
+    public Result allPublish(@RequestBody @Validated MetooVersionClientAppBatchVo appVos) {
+        try {
+            metooVersionClientService.allPublish(appVos);
+            return ResponseUtil.ok();
+        } catch (Exception e) {
+            log.error("全网发布客户端版本版本出现问题：{}", e);
+            return ResponseUtil.fail(e.getMessage());
+        }
+    }
 }
