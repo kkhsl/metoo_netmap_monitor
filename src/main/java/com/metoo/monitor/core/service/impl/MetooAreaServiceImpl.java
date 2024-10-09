@@ -146,7 +146,7 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
                 List<MetooArea> pathArea = this.baseMapper.queryAreaByPath(path);
                 if (CollectionUtil.isNotEmpty(pathArea)) {
                     // 存在上级目录
-                    parentArea.setParentId(parentArea.getId());
+                    parentArea.setParentId(pathArea.get(0).getId());
                 } else {
                     // 不存在上级目录
                     MetooArea topArea = new MetooArea();
