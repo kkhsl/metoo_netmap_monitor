@@ -150,12 +150,6 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             if (VersionLogStatus.PUBLISH.getCode().equals(lastInfo.getVersionStatus()) ||
                     VersionLogStatus.UPLOAD.getCode().equals(lastInfo.getVersionStatus())) {
                 throw new BusiException("当前存在待升级版本");
-            } else {
-                //如果是最新成功的版本，需要比较版本号
-                int result = VersionUtils.compare(application.getVersion(), lastInfo.getVersion());
-                if (result <= 0) {
-                    throw new BusiException("当前版本较低,请重新选择");
-                }
             }
 
         }
