@@ -2,6 +2,8 @@ package com.metoo.monitor.core.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -47,6 +49,27 @@ public class VersionUtils {
         }
 
         return 0;
+    }
+    /**
+     * 将一个列表分成指定数量的子列表
+     *
+     * @param originalList 原始列表
+     * @param numSubLists  要分成的子列表数量
+     * @return 分割后的子列表集合
+     */
+    public static <T> List<List<T>> splitList(List<T> originalList, int numSubLists) {
+        List<List<T>> result = new ArrayList<>();
+        int size = originalList.size();
+        int quotient = size / numSubLists; // 每个子列表的平均大小
+        int remainder = size % numSubLists; // 剩余的元素数量
+
+        for (int i = 0; i < numSubLists; i++) {
+            int start = i * quotient + Math.min(i, remainder);
+            int end = (i + 1) * quotient + Math.min(i + 1, remainder);
+            List<T> subList = originalList.subList(start, end);
+            result.add(new ArrayList<>(subList)); // 使用新的 ArrayList 包装子列表
+        }
+        return result;
     }
     public static void main(String[] args) {
         // 测试版本号

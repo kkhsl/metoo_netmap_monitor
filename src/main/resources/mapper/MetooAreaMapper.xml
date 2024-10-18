@@ -10,6 +10,9 @@
             <if test="parentId != null">
                 parent_id=#{parentId,jdbcType=BIGINT},
             </if>
+            <if test="updateTime == null">
+                update_time=sysdate(),
+            </if>
         </set>
         where unit_id=#{unitId,jdbcType=BIGINT}
     </update>
@@ -68,6 +71,9 @@ where a.path=#{name}
             <if test="unitId != null">
                 unit_id,
             </if>
+            <if test="updateTime == null">
+                update_time,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null">
@@ -79,7 +85,17 @@ where a.path=#{name}
             <if test="unitId != null">
                 #{unitId,jdbcType=BIGINT},
             </if>
+            <if test="updateTime == null">
+                sysdate(),
+            </if>
         </trim>
     </insert>
+    <select id="queryUpdateArea" resultType="com.metoo.monitor.core.entity.MetooArea" >
+        select * from metoo_area a
+        where a.unit_id is not null
+        <if test="startTime != null">
+        and a.update_time between #{startTime} and #{endTime}
+        </if>
 
+    </select>
 </mapper>

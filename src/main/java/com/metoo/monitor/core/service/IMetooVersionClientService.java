@@ -96,4 +96,10 @@ public interface IMetooVersionClientService  {
      * @param allVo
      */
     void allPublish(MetooVersionClientAppBatchVo allVo);
+
+    /**
+     * 同步单位信息
+     * @param syncType
+     */
+    void syncUnit(String syncType);
 }

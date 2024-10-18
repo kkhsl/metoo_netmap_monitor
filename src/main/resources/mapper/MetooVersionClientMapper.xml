@@ -162,6 +162,11 @@
         update metoo_version_client set client_status=#{clientStatus,jdbcType=TINYINT}
         where unit_id = #{unitId,jdbcType=BIGINT}
     </update>
+    <update id="updateClientByNameAndAreaId" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set area_id=#{areaId,jdbcType=TINYINT},
+                                        unit_name=#{unitName,jdbcType=VARCHAR}
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
     <select id="detailById" parameterType="java.lang.Long" resultType="com.metoo.monitor.core.entity.MetooVersionClient">
         select a.* from metoo_version_client a
            where a.unit_id = #{unitId,jdbcType=BIGINT}

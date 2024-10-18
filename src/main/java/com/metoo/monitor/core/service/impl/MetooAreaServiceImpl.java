@@ -181,6 +181,11 @@ public class MetooAreaServiceImpl implements IMetooAreaService {
         return true;
     }
 
+    @Override
+    public List<MetooArea> queryUpdateArea(String startTime, String endTime) {
+        return this.baseMapper.queryUpdateArea(startTime, endTime);
+    }
+
     /**
      * 区域实体转树节点列表
      *

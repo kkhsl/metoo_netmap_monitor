@@ -6,6 +6,7 @@ import com.metoo.monitor.core.vo.MetooAreaSyncVo;
 import com.metoo.monitor.core.vo.MetooAreaVo;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,4 +54,12 @@ public interface IMetooAreaService {
      * @return
      */
     boolean syncBatchArea(List<MetooAreaSyncVo> areaInfos);
+
+    /**
+     * 查询更新的数据
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<MetooArea> queryUpdateArea(String startTime, String endTime);
 }

@@ -2,8 +2,10 @@ package com.metoo.monitor.core.mapper;
 
 import com.metoo.monitor.core.entity.MetooArea;
 import com.metoo.monitor.core.vo.MetooAreaVo;
+import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,4 +63,12 @@ public interface MetooAreaMapper {
      * @return
      */
     List<MetooArea> queryAreaByPath(String name);
+
+    /**
+     * 查询更新的数据
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<MetooArea> queryUpdateArea(@Param("startTime") String startTime, @Param("endTime") String endTime);
 }

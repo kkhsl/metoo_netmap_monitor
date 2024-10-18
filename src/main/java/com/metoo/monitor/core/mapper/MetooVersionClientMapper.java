@@ -72,4 +72,10 @@ public interface MetooVersionClientMapper {
      */
     int updateClientStatus(@Param("unitId")Long unitId, @Param( "clientStatus")Integer clientStatus);
 
+    /**
+     * 更新客户端版本信息-名称和区域编码
+     * @param updateInfo
+     * @return
+     */
+    int updateClientByNameAndAreaId(MetooVersionClient updateInfo);
 }

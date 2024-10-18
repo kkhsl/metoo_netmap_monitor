@@ -1,5 +1,6 @@
 package com.metoo.monitor.core.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
@@ -31,9 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -387,14 +386,89 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             List<List<MetooVersionClient>> newList = Lists.partition(allList, 150);
             for (List<MetooVersionClient> subList : newList) {
                 allVo.setUnitIds(subList.stream().map(MetooVersionClient::getUnitId).collect(Collectors.toList()));
-              try {
-                  this.batchPublish(allVo);
-              }catch (Exception ex){
-                  log.error("全网发布客户端版本出错：{}", ex);
-              }
+                try {
+                    this.batchPublish(allVo);
+                } catch (Exception ex) {
+                    log.error("全网发布客户端版本出错：{}", ex);
+                }
             }
         });
 
+    }
+
+    /**
+     * 同步单位信息
+     * 1表示：全量，0或null:表示增量
+     *
+     * @param syncType
+     */
+    @Override
+    public void syncUnit(String syncType) {
+        Map params = new HashMap();
+        params.put("orderBy", "addTime");
+        params.put("orderType", "asc");
+        List<Application> applicationList = this.applicationService.selectObjByMap(params);
+        Long id = 1L;
+        String version = "1.0.0";
+        if (CollUtil.isNotEmpty(applicationList)) {
+            // 默认第一个
+            version = applicationList.get(0).getVersion();
+            id = applicationList.get(0).getId();
+        }
+        List<MetooArea> allAreaList = new ArrayList<>();
+        // 全量同步
+        if (StrUtil.isNotEmpty(syncType) && ("1").equals(syncType)) {
+            // 获取所有的区域
+            allAreaList = areaService.queryUpdateArea(null, null);
+
+        } else {
+            // 增量更新，取当前时间前一天间隔
+            allAreaList = areaService.queryUpdateArea(DateUtil.offsetDay(new Date(), -1).toString(), DateUtil.now());
+
+        }
+        // 分5个列表
+        List<List<MetooArea>> splitLists = VersionUtils.splitList(allAreaList, 5);
+        for (int i = 0; i < splitLists.size(); i++) {
+            int finalI = i;
+            String finalVersion = version;
+            Long finalId = id;
+            ThreadUtil.execAsync(() -> {
+                // 扫描执行
+                this.updateOrInitVersionInfo(splitLists.get(finalI), finalId, finalVersion);
+            });
+        }
+    }
+
+    /**
+     * 更新或新增版本信息
+     *
+     * @param areaList
+     */
+    public void updateOrInitVersionInfo(List<MetooArea> areaList, Long id, String version) {
+        if (CollUtil.isNotEmpty(areaList)) {
+            areaList.forEach(temp -> {
+                try {
+                    // 先去客户端版本管理查询单位是否存在
+                    MetooVersionClient client = this.clientMapper.detailById(temp.getUnitId());
+                    if (null == client) {
+                        //如果不存在，则进行新增操作
+                        MetooVersionClientVo saveEntity = Convert.convert(MetooVersionClientVo.class, temp);
+                        saveEntity.setUnitName(temp.getName());
+                        saveEntity.setAreaId(temp.getId());
+                        saveEntity.setCurVersion(version);
+                        saveEntity.setCurVersionId(id);
+                        this.save(saveEntity);
+                    } else {
+                        //更新区域名称及区域编码
+                        client.setAreaId(temp.getId());
+                        client.setUnitName(temp.getName());
+                        this.clientMapper.updateClientByNameAndAreaId(client);
+                    }
+                }catch (Exception ex){
+                    log.error("更新或新增版本信息出错了：{}",ex);
+                }
+            });
+        }
     }
 
     /**
