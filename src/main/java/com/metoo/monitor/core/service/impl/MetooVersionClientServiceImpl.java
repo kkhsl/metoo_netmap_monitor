@@ -186,6 +186,14 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         }
         // 当前用用户信息
         User currentUser = ShiroUserHolder.currentUser();
+        // 全网发布前端未传版本号的情况
+        if (StrUtil.isEmpty(appVos.getAppVersion())) {
+            //根据版本号获取版本编码
+            Application application = applicationService.selectObjById(appVos.getAppVersionId());
+            if (null != application) {
+                appVos.setAppVersion(application.getVersion());
+            }
+        }
         // 新增版本记录，为待发布状态
         List<MetooVersionClientLog> logs = CollectionUtil.newArrayList();
         appVos.getUnitIds().forEach(o -> {
