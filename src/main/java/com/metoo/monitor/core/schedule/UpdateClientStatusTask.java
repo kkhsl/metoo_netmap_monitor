@@ -1,6 +1,7 @@
 package com.metoo.monitor.core.schedule;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.enums.ClientStatus;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 
@@ -44,7 +46,7 @@ public class UpdateClientStatusTask {
             for (List<MetooVersionClient> subList:newList) {
                 subList.forEach(client -> {
                     try {
-                        if (null != client.getUpdateTime() && client.getUpdateTime().after(calendar.getTime())) {
+                        if (null != client.getUpdateTime() && DateUtil.parse(client.getUpdateTime(),"yyyy-MM-dd HH:mm:ss").after(calendar.getTime())) {
                             //最近更新时间在1小时之内，说明客户端在线了
                             versionClientService.updateClientStatus(client.getUnitId(), ClientStatus.ONLINE.getCode());
                         } else {

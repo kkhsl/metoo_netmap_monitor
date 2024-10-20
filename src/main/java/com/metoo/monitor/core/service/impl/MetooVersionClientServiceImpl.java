@@ -201,6 +201,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             logEntity.setUnitId(o);
             logEntity.setVersionId(appVos.getAppVersionId());
             logEntity.setVersion(appVos.getAppVersion());
+            logEntity.setAddTime(new Date());
             // logEntity.setOpId(currentUser.getId());
             // logEntity.setOpName(currentUser.getUsername());
             logs.add(logEntity);
