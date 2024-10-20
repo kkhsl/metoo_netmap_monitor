@@ -462,13 +462,13 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                         //如果不存在，则进行新增操作
                         MetooVersionClientVo saveEntity = Convert.convert(MetooVersionClientVo.class, temp);
                         saveEntity.setUnitName(temp.getName());
-                        saveEntity.setAreaId(temp.getId());
+                        saveEntity.setAreaId(temp.getParentId());
                         saveEntity.setCurVersion(version);
                         saveEntity.setCurVersionId(id);
                         this.save(saveEntity);
                     } else {
                         //更新区域名称及区域编码
-                        client.setAreaId(temp.getId());
+                        client.setAreaId(temp.getParentId());
                         client.setUnitName(temp.getName());
                         this.clientMapper.updateClientByNameAndAreaId(client);
                     }

@@ -12,6 +12,7 @@ import com.metoo.monitor.core.vo.MetooAreaSyncVo;
 import com.metoo.monitor.core.vo.Result;
 import com.metoo.monitor.core.vo.version.MetooVersionClientUpdateVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientVo;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -276,6 +277,18 @@ public class ApiManagerController {
         }catch (Exception ex){
             log.error("同步新增区域信息-批量更新出现错误：{}",ex);
             return ResponseUtil.fail(ex.getMessage());
+        }
+    }
+    @GetMapping("/syncUnit")
+    @ApiOperation(value = "同步单位信息", notes = "同步单位信息")
+    @ApiImplicitParam(name = "syncType", value = "同步类型：1表示全量，0表示增量", dataType = "String")
+    public Result syncUnit(String syncType) {
+        try {
+            metooVersionClientService.syncUnit(syncType);
+            return ResponseUtil.ok();
+        } catch (Exception e) {
+            log.error("同步单位信息出现问题：{}", e);
+            return ResponseUtil.fail(e.getMessage());
         }
     }
 }

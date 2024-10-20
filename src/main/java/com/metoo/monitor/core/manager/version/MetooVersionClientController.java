@@ -133,16 +133,5 @@ public class MetooVersionClientController {
         }
     }
 
-    @GetMapping("/syncUnit")
-    @ApiOperation(value = "同步单位信息", notes = "同步单位信息")
-    @ApiImplicitParam(name = "syncType", value = "同步类型：1表示全量，0表示增量", dataType = "String")
-    public Result syncUnit(String syncType) {
-        try {
-            metooVersionClientService.syncUnit(syncType);
-            return ResponseUtil.ok();
-        } catch (Exception e) {
-            log.error("同步单位信息出现问题：{}", e);
-            return ResponseUtil.fail(e.getMessage());
-        }
-    }
+
 }

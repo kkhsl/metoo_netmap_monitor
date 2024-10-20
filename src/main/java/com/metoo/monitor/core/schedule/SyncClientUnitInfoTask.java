@@ -25,7 +25,7 @@ public class SyncClientUnitInfoTask {
     /**
      * 更新客户端状态时任务
      */
-    @Scheduled(fixedRate = 8 * 60 * 60 * 1000)
+    @Scheduled(fixedRate = 5* 60 * 1000)
     public void SyncClientUnitInfoTask() {
         if (clientUnitSyncSwitch) {
             log.info("====================================定时任务更新客户端区域信息任务开始执行==========================");
