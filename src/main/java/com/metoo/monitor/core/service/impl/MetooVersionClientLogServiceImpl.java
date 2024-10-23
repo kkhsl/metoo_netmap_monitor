@@ -1,5 +1,6 @@
 package com.metoo.monitor.core.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -94,5 +95,39 @@ public class MetooVersionClientLogServiceImpl implements IMetooVersionClientLogS
     @Override
     public boolean batchUpdate(MetooVersionClientAppBatchVo vo) {
         return this.baseMapper.batchUpdate(vo.getUnitIds(),vo.getAppVersion())>0;
+    }
+
+    /**
+     * 用于升级版本处理，更新低版本为更新失败，并备注忽略更新
+     * @param unitId
+     * @param versionId
+     */
+    @Override
+    public void beforeInfoUpdate(Long unitId, Long versionId) {
+        List<MetooVersionClientLog> infoList= this.baseMapper.beforeList(unitId,versionId);
+        if(CollUtil.isNotEmpty(infoList)){
+            infoList.forEach(o->{
+                o.setVersionStatus(VersionLogStatus.CANCEL.getCode());
+                o.setErrorInfo("忽略更新");
+                this.baseMapper.updateLogStatus(o);
+            });
+        }
+    }
+
+    /**
+     * 用于回退版本处理，更新其他版本为更新失败，并备注忽略更新
+     * @param unitId
+     * @param versionId
+     */
+    @Override
+    public void  notVersionUpdate(Long unitId, Long versionId,String errorMsg) {
+        List<MetooVersionClientLog> infoList=this.baseMapper.notVersionList(unitId,versionId);
+        if(CollUtil.isNotEmpty(infoList)){
+            infoList.forEach(o->{
+                o.setVersionStatus(VersionLogStatus.CANCEL.getCode());
+                o.setErrorInfo(errorMsg);
+                this.baseMapper.updateLogStatus(o);
+            });
+        }
     }
 }

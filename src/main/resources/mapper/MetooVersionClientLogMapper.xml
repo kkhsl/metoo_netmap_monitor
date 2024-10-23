@@ -12,7 +12,28 @@
             and version_status=1
             and delete_status=0
     </update>
-
+    <select id="beforeList" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog">
+        select a.*,b.`desc` as versionRemark from metoo_version_client_log a
+        left join metoo_application b
+        on a.version_id =b.id
+        where 1=1
+        and a.delete_STATUS=0
+        and a.version_status=1
+        and a.unit_id=#{unitId,jdbcType=BIGINT}
+        and a.version_id &lt;#{versionId,jdbcType=BIGINT}
+        order by a.add_time desc
+    </select>
+    <select id="notVersionList" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog">
+        select a.*,b.`desc` as versionRemark from metoo_version_client_log a
+                                                      left join metoo_application b
+                                                                on a.version_id =b.id
+        where 1=1
+          and a.delete_STATUS=0
+          and a.version_status=1
+          and a.unit_id=#{unitId,jdbcType=BIGINT}
+          and a.version_id !=#{versionId,jdbcType=BIGINT}
+        order by a.add_time desc
+    </select>
     <select id="list" resultType="com.metoo.monitor.core.entity.MetooVersionClientLog"
             parameterType="com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo">
         select a.*,b.`desc` as versionRemark from metoo_version_client_log a

@@ -247,28 +247,44 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         List<MetooVersionClientLog> versionList = clientLogService.queryUpdateVersion(curVo.getUnitId());
         if (CollectionUtil.isNotEmpty(versionList)) {
             MetooVersionClientLog lastInfo = versionList.get(0);
-            // 版本是否存在跨版本的情况，如果是增量版本需要一个个升级操作
-            List<Application> appList = applicationService.queryUpdateVersions(curVo.getCurVersionId(), lastInfo.getVersionId());
-            if (CollectionUtil.isNotEmpty(appList)) {
-                if (appList.size() == 1) {
-                    // 只有一个版本升级
-                    return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(appList.get(0).getId()).appVersion(appList.get(0).getVersion()).build();
-                } else {
-                    //多个版本情况，需倒序升级
-                    Application app = appList.get(0);
-                    if (VersionType.ALL.getCode().equals(app.getVersionType())) {
-                        // 如果最新为全量版本则只更新当前版本
-                        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(app.getId()).appVersion(app.getVersion()).build();
+            if(lastInfo.getVersionId()>curVo.getCurVersionId()) {
+                // 版本是否存在跨版本的情况，如果是增量版本需要一个个升级操作
+                log.info("{}当前版本是正常升级版本:{},{}", curVo.getUnitId(),lastInfo.getVersionId(), curVo.getCurVersionId());
+                List<Application> appList = applicationService.queryUpdateVersions(curVo.getCurVersionId(), lastInfo.getVersionId());
+                if (CollectionUtil.isNotEmpty(appList)) {
+                    if (appList.size() == 1) {
+                        // 只有一个版本升级
+                        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(appList.get(0).getId()).appVersion(appList.get(0).getVersion()).build();
                     } else {
                         //多个版本情况，需倒序升级
-                        return getLastVersionByUpdate(appList, curVo.getCurVersion(), curVo.getUnitId());
+                        Application app = appList.get(0);
+                        if (VersionType.ALL.getCode().equals(app.getVersionType())) {
+                            // 需更新之前不需要升级的版本为已完成状态
+                            clientLogService.notVersionUpdate(curVo.getUnitId(), app.getId(),"忽略更新");
+                            // 如果最新为全量版本则只更新当前版本
+                            log.info("{}全量版本只更新当前版本:{}",curVo.getUnitId(), app.getVersion());
+                            return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(app.getId()).appVersion(app.getVersion()).build();
+                        } else {
+                            //多个版本情况，需倒序升级
+                            MetooVersionClientAppUpdateVo result=getLastVersionByUpdate(appList, curVo.getCurVersion(), curVo.getUnitId());
+                            if(null!=result){
+                                log.info("{}多个版本情况，需倒序升级:{},{}",curVo.getUnitId(), result.getAppVersionId(), result.getAppVersion());
+                                clientLogService.beforeInfoUpdate(curVo.getUnitId(), result.getAppVersionId());
+                            }
+                            return result;
+                        }
                     }
                 }
+            }else if(lastInfo.getVersionId()<curVo.getCurVersionId()){
+                // 当前版本是回退版本，直接回退
+                log.info("{}当前版本是回退版本:{},{}",curVo.getUnitId(), lastInfo.getVersionId(), curVo.getCurVersionId());
+                // 需更新之前不需要升级的版本为已完成状态
+                clientLogService.notVersionUpdate(curVo.getUnitId(), lastInfo.getVersionId(),"忽略更新(版本回退操作)");
+                return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(lastInfo.getVersionId()).appVersion(lastInfo.getVersion()).build();
             }
         }
         return null;
     }
-
     /**
      * 获取倒序去最新的版本
      *
@@ -277,6 +293,24 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
      * @return
      */
     private MetooVersionClientAppUpdateVo getLastVersionByUpdate(List<Application> appList, String curVersion, Long unitId) {
+        // 完善多个全量版本情况，只推送最新的全量版本
+        for (int i = 0; i < appList.size(); i++) {
+            Application tempAll = appList.get(i);
+            if (VersionType.ALL.getCode().equals(tempAll.getVersionType())) {
+                //顺序找到最新一个全量版本
+                if (!curVersion.equals(tempAll.getVersion())) {
+                    // 找到最新一个全量版本且不等于客户端当前版本
+                    return MetooVersionClientAppUpdateVo.builder().unitId(unitId).appVersionId(tempAll.getId()).appVersion(tempAll.getVersion()).build();
+                 }else{
+                    // 当前版本与客户端版本已升级过，则推送上一个增量版本（如果存在的话）
+                    if(i-1>=0){
+                        Application tempAdd = appList.get(i-1);
+                        return MetooVersionClientAppUpdateVo.builder().unitId(unitId).appVersionId(tempAdd.getId()).appVersion(tempAdd.getVersion()).build();
+                    }
+                }
+            }
+        }
+        // 顺序没找到全量版本，剩下都是增量版本情况下
         for (int i = appList.size() - 1; i >= 0; i--) {
             Application tempApp = appList.get(i);
             if (!curVersion.equals(tempApp.getVersion())) {

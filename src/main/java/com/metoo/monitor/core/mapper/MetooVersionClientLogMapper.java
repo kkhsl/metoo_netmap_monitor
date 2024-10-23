@@ -66,4 +66,20 @@ public interface MetooVersionClientLogMapper  {
      * @return
      */
     int batchUpdate(@Param("ids") List<Long> ids,@Param("version") String version);
+
+    /**
+     *  获取当前之前版本列表
+     * @param unitId
+     * @param versionId
+     * @return
+     */
+    List<MetooVersionClientLog> beforeList(@Param("unitId") Long unitId,@Param("versionId") Long versionId);
+
+    /**
+     * 获取非当前版本列表
+     * @param unitId
+     * @param versionId
+     * @return
+     */
+    List<MetooVersionClientLog> notVersionList(@Param("unitId") Long unitId,@Param("versionId") Long versionId);
 }

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.metoo.monitor.core.entity.MetooVersionClientLog;
 import com.metoo.monitor.core.vo.version.MetooVersionClientAppBatchVo;
 import com.metoo.monitor.core.vo.version.MetooVersionClientLogQueryVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,4 +66,20 @@ public interface IMetooVersionClientLogService  {
      * @return
      */
     boolean batchUpdate(MetooVersionClientAppBatchVo vo);
+
+    /**
+     *  获取当前之前版本列表
+     * @param unitId
+     * @param versionId
+     * @return
+     */
+    void beforeInfoUpdate( Long unitId,Long versionId);
+
+    /**
+     * 获取非当前版本列表
+     * @param unitId
+     * @param versionId
+     * @return
+     */
+    void notVersionUpdate(Long unitId,Long versionId,String errorMsg);
 }
