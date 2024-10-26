@@ -101,7 +101,6 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             throw new BusiException("客户端已存在");
         }
         // 当前用用户信息
-        User currentUser = ShiroUserHolder.currentUser();
         // 保存客户端信息
         MetooVersionClient saveEntity = Convert.convert(MetooVersionClient.class, versionClientVo);
         saveEntity.setVersionStatus(VersionStatus.NORMAL.getCode());
@@ -452,7 +451,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
         params.put("orderType", "asc");
         List<Application> applicationList = this.applicationService.selectObjByMap(params);
         Long id = 1L;
-        String version = "1.0.0";
+        String version = "1.0.0.0";
         if (CollUtil.isNotEmpty(applicationList)) {
             // 默认第一个
             version = applicationList.get(0).getVersion();
