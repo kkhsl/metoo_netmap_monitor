@@ -155,7 +155,7 @@
     <update id="updateAppInfoAndStatusFromClient" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
         update metoo_version_client set cur_version_id=#{curVersionId,jdbcType=BIGINT},
                                         cur_version=#{curVersion,jdbcType=VARCHAR},version_status=#{versionStatus,jdbcType=TINYINT}
-        ,update_time=sysdate()
+        ,update_time=sysdate(),client_status=1
         where unit_id = #{unitId,jdbcType=BIGINT}
     </update>
     <update id="updateClientStatus">
