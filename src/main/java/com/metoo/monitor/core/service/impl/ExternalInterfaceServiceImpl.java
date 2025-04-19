@@ -1,6 +1,8 @@
 package com.metoo.monitor.core.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.metoo.monitor.core.entity.MetooVersionClient;
+import com.metoo.monitor.core.exception.BusiException;
 import com.metoo.monitor.core.mapper.MetooVersionClientMapper;
 import com.metoo.monitor.core.service.IExternalInterfaceService;
 import com.metoo.monitor.core.vo.external.SurveyTimeVo;
@@ -26,6 +28,10 @@ public class ExternalInterfaceServiceImpl implements IExternalInterfaceService {
      */
     @Override
     public boolean sendSurveyTime(SurveyTimeVo params) {
+        MetooVersionClient clientInfo= clientMapper.detailById(params.getUnitId());
+        if(null==clientInfo){
+            throw new BusiException("单位信息不存在");
+        }
         return this.clientMapper.updateClientSurveyTime(params.getUnitId(), DateUtil.parseDateTime(params.getSurveyTime())) > 0;
     }
 }

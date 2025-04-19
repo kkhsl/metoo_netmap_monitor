@@ -35,11 +35,15 @@ public class ExternalInterfaceController {
     @ApiOperation(value = "发送下发测绘任务时间", notes = "发送下发测绘任务时间")
     public Result sendSurveyTime(@RequestBody SurveyTimeVo params){
         try {
-            externalInterfaceService.sendSurveyTime(params);
-            return ResponseUtil.ok("下发任务成功");
+            boolean result=externalInterfaceService.sendSurveyTime(params);
+            if(result) {
+                return ResponseUtil.ok("下发任务成功");
+            }else{
+                return ResponseUtil.fail("下发任务失败");
+            }
         } catch (Exception e) {
             log.error("下发任务失败：{}", e);
-            return ResponseUtil.fail("下发任务失败");
+            return ResponseUtil.fail("下发任务失败:"+e.getMessage());
         }
     }
 }
