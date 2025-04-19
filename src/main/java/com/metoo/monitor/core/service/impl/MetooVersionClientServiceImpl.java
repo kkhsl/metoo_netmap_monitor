@@ -242,6 +242,8 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
             updateVersionAndTime(curVo.getCurVersionId(), curVo.getCurVersion(), curVo.getUnitId());
         });
         // 检测更新逻辑
+        // 根据单位id查询现在版本信息
+        MetooVersionClient unitVersionInfo = clientMapper.detailById(curVo.getUnitId());
         // 查询当前客户端是否存在已发布的版本数据
         List<MetooVersionClientLog> versionList = clientLogService.queryUpdateVersion(curVo.getUnitId());
         if (CollectionUtil.isNotEmpty(versionList)) {
@@ -253,7 +255,11 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                 if (CollectionUtil.isNotEmpty(appList)) {
                     if (appList.size() == 1) {
                         // 只有一个版本升级
-                        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(appList.get(0).getId()).appVersion(appList.get(0).getVersion()).build();
+                        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId())
+                                .appVersionId(appList.get(0).getId())
+                                .appVersion(appList.get(0).getVersion())
+                                .surveyTime(unitVersionInfo.getSurveyTime())
+                                .build();
                     } else {
                         //多个版本情况，需倒序升级
                         Application app = appList.get(0);
@@ -262,7 +268,10 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                             clientLogService.notVersionUpdate(curVo.getUnitId(), app.getId(),"忽略更新");
                             // 如果最新为全量版本则只更新当前版本
                             log.info("{}全量版本只更新当前版本:{}",curVo.getUnitId(), app.getVersion());
-                            return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(app.getId()).appVersion(app.getVersion()).build();
+                            return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId())
+                                    .appVersionId(app.getId()).appVersion(app.getVersion())
+                                    .surveyTime(unitVersionInfo.getSurveyTime())
+                                    .build();
                         } else {
                             //多个版本情况，需倒序升级
                             MetooVersionClientAppUpdateVo result=getLastVersionByUpdate(appList, curVo.getCurVersion(), curVo.getUnitId());
@@ -270,6 +279,7 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                                 log.info("{}多个版本情况，需倒序升级:{},{}",curVo.getUnitId(), result.getAppVersionId(), result.getAppVersion());
                                 clientLogService.beforeInfoUpdate(curVo.getUnitId(), result.getAppVersionId());
                             }
+                            result.setSurveyTime(unitVersionInfo.getSurveyTime());
                             return result;
                         }
                     }
@@ -279,10 +289,16 @@ public class MetooVersionClientServiceImpl implements IMetooVersionClientService
                 log.info("{}当前版本是回退版本:{},{}",curVo.getUnitId(), lastInfo.getVersionId(), curVo.getCurVersionId());
                 // 需更新之前不需要升级的版本为已完成状态
                 clientLogService.notVersionUpdate(curVo.getUnitId(), lastInfo.getVersionId(),"忽略更新(版本回退操作)");
-                return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId()).appVersionId(lastInfo.getVersionId()).appVersion(lastInfo.getVersion()).build();
+                return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId())
+                        .appVersionId(lastInfo.getVersionId())
+                        .appVersion(lastInfo.getVersion())
+                        .surveyTime(unitVersionInfo.getSurveyTime())
+                        .build();
             }
         }
-        return null;
+        return MetooVersionClientAppUpdateVo.builder().unitId(curVo.getUnitId())
+                .surveyTime(unitVersionInfo.getSurveyTime())
+                .build();
     }
     /**
      * 获取倒序去最新的版本

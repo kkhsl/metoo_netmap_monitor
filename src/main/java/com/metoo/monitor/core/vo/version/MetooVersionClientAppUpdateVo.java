@@ -1,5 +1,6 @@
 package com.metoo.monitor.core.vo.version;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -39,4 +41,11 @@ public class MetooVersionClientAppUpdateVo {
      */
     @ApiModelProperty("指定安装的版本")
     private String appVersion;
+
+    /**
+     * 指定测绘时间
+     */
+    @ApiModelProperty("指定测绘时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date surveyTime;
 }

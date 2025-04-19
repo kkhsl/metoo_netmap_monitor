@@ -176,5 +176,8 @@
         select a.* from metoo_version_client a
         where a.delete_status=0
     </select>
-
+    <update id="updateClientSurveyTime" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set survey_time=#{surveyTime}
+        where unit_id = #{unitId,jdbcType=BIGINT}
+    </update>
 </mapper>

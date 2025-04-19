@@ -5,6 +5,7 @@ import com.metoo.monitor.core.vo.version.MetooVersionClientQueryVo;
 import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,4 +79,11 @@ public interface MetooVersionClientMapper {
      * @return
      */
     int updateClientByNameAndAreaId(MetooVersionClient updateInfo);
+    /**
+     * 更新客户端测绘时间
+     * @param unitId
+     * @return
+     */
+    int updateClientSurveyTime(@Param("unitId") Long unitId, @Param( "surveyTime") Date surveyTime);
+
 }
