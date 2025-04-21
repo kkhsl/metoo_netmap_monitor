@@ -1,6 +1,8 @@
 package com.metoo.monitor.core.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.metoo.monitor.core.entity.MetooVersionClient;
 import com.metoo.monitor.core.exception.BusiException;
 import com.metoo.monitor.core.mapper.MetooVersionClientMapper;
@@ -28,10 +30,21 @@ public class ExternalInterfaceServiceImpl implements IExternalInterfaceService {
      */
     @Override
     public boolean sendSurveyTime(SurveyTimeVo params) {
-        MetooVersionClient clientInfo= clientMapper.detailById(params.getUnitId());
-        if(null==clientInfo){
-            throw new BusiException("单位信息不存在");
+        if (null == params || CollUtil.isEmpty(params.getUnitId())) {
+            throw new BusiException("单位编码不能为空");
         }
-        return this.clientMapper.updateClientSurveyTime(params.getUnitId(), DateUtil.parseDateTime(params.getSurveyTime())) > 0;
+        if (StrUtil.isEmpty(params.getSurveyTime())) {
+            throw new BusiException("测绘时间不能为空");
+        }
+        if (CollUtil.isNotEmpty(params.getUnitId())) {
+            params.getUnitId().forEach(o -> {
+                MetooVersionClient clientInfo = clientMapper.detailById(o);
+                if (null == clientInfo) {
+                    log.error("{}单位信息不存在",o);
+                }
+                this.clientMapper.updateClientSurveyTime(o, DateUtil.parseDateTime(params.getSurveyTime()));
+            });
+        }
+        return true;
     }
 }

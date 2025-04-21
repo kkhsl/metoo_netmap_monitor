@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 测绘下发任务信息
  * @author zzy
@@ -18,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SurveyTimeVo {
     @ApiModelProperty("单位编码")
-    private Long unitId;
+    private List<Long> unitId;
 
     @ApiModelProperty("测绘时间")
     private String surveyTime;
