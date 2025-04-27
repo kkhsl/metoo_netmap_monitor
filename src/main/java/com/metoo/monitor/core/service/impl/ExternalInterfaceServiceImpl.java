@@ -30,9 +30,6 @@ public class ExternalInterfaceServiceImpl implements IExternalInterfaceService {
      */
     @Override
     public boolean sendSurveyTime(SurveyTimeVo params) {
-        if (null == params || CollUtil.isEmpty(params.getUnitId())) {
-            throw new BusiException("单位编码不能为空");
-        }
         if (StrUtil.isEmpty(params.getSurveyTime())) {
             throw new BusiException("测绘时间不能为空");
         }
@@ -44,6 +41,10 @@ public class ExternalInterfaceServiceImpl implements IExternalInterfaceService {
                 }
                 this.clientMapper.updateClientSurveyTime(o, DateUtil.parseDateTime(params.getSurveyTime()));
             });
+        }else{
+            //所有单位更新测绘时间
+            this.clientMapper.updateAllClientSurveyTime(DateUtil.parseDateTime(params.getSurveyTime()));
+
         }
         return true;
     }
