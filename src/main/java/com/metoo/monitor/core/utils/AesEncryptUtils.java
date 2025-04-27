@@ -15,7 +15,7 @@ import java.util.Map;
 public class AesEncryptUtils {
 
     //可配置到Constant中，并读取配置文件注入,16位,自定义
-    private static final String KEY = "@NPzwDvPmCJvpYuE";
+    private static final String  KEY = "@NPzwDvPmCJvpYuE";
 
     //参数分别代表 算法名称/加密模式/数据填充方式
     private static final String ALGORITHMSTR = "AES/ECB/PKCS5Padding";

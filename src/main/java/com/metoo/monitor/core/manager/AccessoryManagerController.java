@@ -29,20 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/api/nrsm/traffic")
+
 @RestController
 public class AccessoryManagerController {
 
-    @Autowired
-    private IAccessoryService accessoryService;
-
-    @ApiOperation("版本信息")
-    @GetMapping("/data/{traffic}")
-    public String version(@PathVariable String traffic){
-        Accessory accessory = new Accessory();
-        accessory.setName(traffic);
-        int i = this.accessoryService.save(accessory);
-        return "ok";
-    }
 
 }
