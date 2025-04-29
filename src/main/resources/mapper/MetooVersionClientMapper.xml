@@ -179,5 +179,10 @@
     <update id="updateClientSurveyTime" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
         update metoo_version_client set survey_time=#{surveyTime}
         where unit_id = #{unitId,jdbcType=BIGINT}
+          and delete_status=0
+    </update>
+    <update id="updateAllClientSurveyTime" parameterType="com.metoo.monitor.core.entity.MetooVersionClient">
+        update metoo_version_client set survey_time=#{surveyTime}
+        where delete_status=0
     </update>
 </mapper>

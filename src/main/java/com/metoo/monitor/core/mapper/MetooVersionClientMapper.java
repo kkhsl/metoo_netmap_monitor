@@ -85,5 +85,11 @@ public interface MetooVersionClientMapper {
      * @return
      */
     int updateClientSurveyTime(@Param("unitId") Long unitId, @Param( "surveyTime") Date surveyTime);
+    /**
+     * 更新客户端测绘时间（所有）
+     * @param surveyTime
+     * @return
+     */
+    int updateAllClientSurveyTime(@Param( "surveyTime") Date surveyTime);
 
 }
