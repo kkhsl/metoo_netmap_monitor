@@ -60,8 +60,6 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/test/**", "anon");
 
         filterChainDefinitionMap.put("/monitor/application/download", "anon");
-
-
         filterChainDefinitionMap.put("/swagger-ui.html", "anon");
 
         filterChainDefinitionMap.put("/monitor/login", "anon");
@@ -77,6 +75,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/monitor/auth/404", "anon");
 
 
+        filterChainDefinitionMap.put("/monitor/external/**", "authcBasic");
         filterChainDefinitionMap.put("/monitor/**", "mac");
 //        filterChainDefinitionMap.put("/monitor/**", "authc");
 
@@ -85,7 +84,6 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/upload/**", "anon");
         filterChainDefinitionMap.put("/hls/**", "anon");
-        filterChainDefinitionMap.put("/external/**", "authcBasic");
         //shiroFilterFactoryBean.setLoginUrl("/login.jsp");
         //shiroFilterFactoryBean.setLoginUrl("/buyer/login");
           shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

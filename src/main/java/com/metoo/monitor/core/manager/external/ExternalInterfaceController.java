@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "外部接口管理")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/external")
+@RequestMapping("/monitor/external")
 @Slf4j
 public class ExternalInterfaceController {
     private final IExternalInterfaceService externalInterfaceService;
